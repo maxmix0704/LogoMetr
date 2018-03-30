@@ -13,7 +13,7 @@ import java.awt.*;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-public class СaptureController{
+public class CaptureController {
 
     @FXML
     Label lbl1;
