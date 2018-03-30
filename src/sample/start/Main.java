@@ -1,29 +1,33 @@
-package sample;
+package sample.start;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 
-import javax.imageio.ImageIO;
 import java.awt.*;
-import java.awt.image.BufferedImage;
 
 public class Main extends Application {
+    private Stage primaryStage;
 
     @Override
     public void start(Stage primaryStage) throws Exception{
-        Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
+        this.primaryStage = primaryStage;
+        Parent root = FXMLLoader.load(getClass().getResource("../fxml/MainWindow.fxml"));
         primaryStage.setTitle("Hello World");
-        primaryStage.setScene(new Scene(root, 300, 275));
+        primaryStage.setScene(new Scene(root, 600, 400));
+        primaryStage.setMinHeight(420);
+        primaryStage.setMinWidth(640);
         primaryStage.show();
     }
 
 
     public static void main(String[] args) throws AWTException {
         launch(args);
+    }
+
+    public Stage getPrimaryStage(){
+        return this.primaryStage;
     }
 }
