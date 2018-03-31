@@ -1,11 +1,15 @@
 package sample.controllers;
 
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.stage.*;
 
 
@@ -13,6 +17,10 @@ import java.io.IOException;
 
 
 public class Controller {
+
+    @FXML
+    public ImageView imgViewMain;
+
     @FXML
     Button btn1;
 
@@ -32,11 +40,19 @@ public class Controller {
         stage.setY(0);
         personController.canvas.setHeight(personController.getHeightScreen());
         personController.canvas.setWidth(personController.getWidthScreen());
-//        stage.initModality(Modality.WINDOW_MODAL);
+        stage.initModality(Modality.WINDOW_MODAL);
         stage.initStyle(StageStyle.UNDECORATED);
         personController.setImage();
 //        personController.setFigure();
         stage.show();
+        stage.getScene().setOnKeyPressed(new EventHandler<KeyEvent>() {
+            public void handle(KeyEvent keyEvent) {
+                if (keyEvent.getCode() == KeyCode.ENTER) {
+                    imgViewMain.setImage(personController.grabScreenRegion(personController.startX,personController.startY,personController.endX,personController.endY));
+                    stage.close();
+                }
+            }
+        });
     }
 
 
