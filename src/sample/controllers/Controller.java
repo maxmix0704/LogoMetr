@@ -10,6 +10,7 @@ import javafx.scene.control.Button;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.ScrollEvent;
 import javafx.stage.*;
 
 
@@ -57,6 +58,17 @@ public class Controller {
         });
     }
 
+    public void scrollMouse(ScrollEvent scrollEvent) {
+        if (scrollEvent.getDeltaY()>0){
+            imgViewMain.setFitWidth(imgViewMain.getFitWidth()*0.9);
+            imgViewMain.setFitHeight(imgViewMain.getFitHeight()*0.9);
+        }
+        else
+        {
+            imgViewMain.setFitWidth(imgViewMain.getFitWidth()*1.1);
+            imgViewMain.setFitHeight(imgViewMain.getFitHeight()*1.1);
+        }
+    }
 
 
 //    public void initialize() {

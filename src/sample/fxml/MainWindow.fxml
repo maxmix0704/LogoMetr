@@ -18,7 +18,7 @@
          <children>
             <StackPane layoutX="81.0" layoutY="23.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="200.0" AnchorPane.topAnchor="0.0">
                <children>
-                  <ImageView fx:id="imgViewMain" fitHeight="100.0" fitWidth="100.0" pickOnBounds="true" preserveRatio="true" />
+                  <ImageView fx:id="imgViewMain" fitHeight="100.0" fitWidth="100.0" onScroll="#scrollMouse" pickOnBounds="true" preserveRatio="true" />
                </children>
             </StackPane>
             <Accordion layoutX="364.0" layoutY="61.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
