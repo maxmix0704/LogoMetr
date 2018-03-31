@@ -9,13 +9,18 @@
 <?import javafx.scene.control.TitledPane?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
 <SplitPane dividerPositions="0.5" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="400.0" minWidth="600.0" orientation="VERTICAL" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.controllers.Controller">
   <items>
     <AnchorPane minHeight="80.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
          <children>
-            <ImageView fx:id="imgViewMain" fitHeight="150.0" fitWidth="200.0" layoutX="81.0" layoutY="23.0" pickOnBounds="true" preserveRatio="true" />
+            <StackPane layoutX="81.0" layoutY="23.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="200.0" AnchorPane.topAnchor="0.0">
+               <children>
+                  <ImageView fx:id="imgViewMain" fitHeight="100.0" fitWidth="100.0" pickOnBounds="true" preserveRatio="true" />
+               </children>
+            </StackPane>
             <Accordion layoutX="364.0" layoutY="61.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
               <panes>
                 <TitledPane animated="false" onDragDetected="#pressBtn" text="Control">

@@ -49,6 +49,8 @@ public class Controller {
             public void handle(KeyEvent keyEvent) {
                 if (keyEvent.getCode() == KeyCode.ENTER) {
                     imgViewMain.setImage(personController.grabScreenRegion(personController.startX,personController.startY,personController.endX,personController.endY));
+                    imgViewMain.setFitWidth(imgViewMain.getImage().getWidth());
+                    imgViewMain.setFitHeight(imgViewMain.getImage().getHeight());
                     stage.close();
                 }
             }
