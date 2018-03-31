@@ -30,9 +30,12 @@ public class Controller {
         stage.setScene(new Scene(root,personController.getWidthScreen(),personController.getHeightScreen()));
         stage.setX(0);
         stage.setY(0);
-        stage.initModality(Modality.WINDOW_MODAL);
+        personController.canvas.setHeight(personController.getHeightScreen());
+        personController.canvas.setWidth(personController.getWidthScreen());
+//        stage.initModality(Modality.WINDOW_MODAL);
         stage.initStyle(StageStyle.UNDECORATED);
         personController.setImage();
+//        personController.setFigure();
         stage.show();
     }
 
