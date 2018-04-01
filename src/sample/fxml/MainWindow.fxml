@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Rectangle2D?>
+<?import javafx.scene.canvas.Canvas?>
 <?import javafx.scene.control.Accordion?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ScrollPane?>
@@ -18,7 +20,12 @@
          <children>
             <StackPane layoutX="81.0" layoutY="23.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="200.0" AnchorPane.topAnchor="0.0">
                <children>
-                  <ImageView fx:id="imgViewMain" fitHeight="100.0" fitWidth="100.0" onScroll="#scrollMouse" pickOnBounds="true" preserveRatio="true" />
+                  <Canvas fx:id="canvasMain" height="100.0" nodeOrientation="INHERIT" width="100.0" />
+                  <ImageView fx:id="imgViewMain" fitHeight="100.0" fitWidth="100.0" nodeOrientation="INHERIT" onScroll="#scrollMouse" pickOnBounds="true" preserveRatio="true">
+                     <viewport>
+                        <Rectangle2D />
+                     </viewport>
+                  </ImageView>
                </children>
             </StackPane>
             <Accordion layoutX="364.0" layoutY="61.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">

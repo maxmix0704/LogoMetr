@@ -6,6 +6,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Button;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
@@ -23,7 +24,7 @@ public class Controller {
     public ImageView imgViewMain;
 
     @FXML
-    Button btn1;
+    Canvas canvasMain;
 
     @FXML
     public void pressBtnCreateFrame(ActionEvent event) {
@@ -58,15 +59,21 @@ public class Controller {
     }
 
     public void scrollMouse(ScrollEvent scrollEvent) {
+        int width = (int) imgViewMain.getFitWidth();
+        int height = (int) imgViewMain.getFitHeight();
         if (scrollEvent.getDeltaY()>0){
-            imgViewMain.setFitWidth(imgViewMain.getFitWidth()*0.9);
-            imgViewMain.setFitHeight(imgViewMain.getFitHeight()*0.9);
+            width*=0.9;
+            height*=0.9;
         }
         else
         {
-            imgViewMain.setFitWidth(imgViewMain.getFitWidth()*1.1);
-            imgViewMain.setFitHeight(imgViewMain.getFitHeight()*1.1);
+            width*=1.1;
+            height*=1.1;
         }
+        imgViewMain.setFitWidth(width);
+        imgViewMain.setFitHeight(height);
+        canvasMain.setWidth(width);
+        canvasMain.setHeight(height);
     }
 
 }
