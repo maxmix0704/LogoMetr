@@ -18,14 +18,14 @@
   <items>
     <AnchorPane minHeight="80.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
          <children>
-            <StackPane layoutX="81.0" layoutY="23.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="200.0" AnchorPane.topAnchor="0.0">
+            <StackPane fx:id="stackPane" layoutX="81.0" layoutY="23.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="200.0" AnchorPane.topAnchor="0.0">
                <children>
-                  <Canvas fx:id="canvasMain" height="100.0" nodeOrientation="INHERIT" width="100.0" />
-                  <ImageView fx:id="imgViewMain" fitHeight="100.0" fitWidth="100.0" nodeOrientation="INHERIT" onScroll="#scrollMouse" pickOnBounds="true" preserveRatio="true">
+                  <ImageView fx:id="imgViewMain" fitHeight="100.0" fitWidth="100.0" nodeOrientation="INHERIT" pickOnBounds="true" preserveRatio="true">
                      <viewport>
                         <Rectangle2D />
                      </viewport>
                   </ImageView>
+                  <Canvas fx:id="canvasMain" height="100.0" nodeOrientation="INHERIT" onKeyPressed="#pressEnter" onMouseMoved="#movedMouseMain" onMousePressed="#pressMouseMain" onScroll="#scrollMouse" width="100.0" />
                </children>
             </StackPane>
             <Accordion layoutX="364.0" layoutY="61.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
@@ -37,7 +37,7 @@
                               <VBox alignment="CENTER" layoutX="50.0" layoutY="3.0" prefHeight="157.0" prefWidth="100.0" spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                  <children>
                                     <Button mnemonicParsing="false" onAction="#pressBtnCreateFrame" prefHeight="25.0" prefWidth="85.0" text="Create frame" />
-                                    <Button mnemonicParsing="false" prefHeight="25.0" prefWidth="85.0" text="Check logo" />
+                                    <Button mnemonicParsing="false" onAction="#checkLogo" prefHeight="25.0" prefWidth="85.0" text="Check logo" />
                                     <Button mnemonicParsing="false" prefHeight="25.0" prefWidth="85.0" text="Save" />
                                  </children>
                               </VBox>

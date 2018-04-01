@@ -68,7 +68,7 @@ public class CaptureController implements Initializable{
         return null;
     }
 
-    public void drawRect(int x, int y, int x2, int y2){
+    public void drawRect(GraphicsContext gc, int x, int y, int x2, int y2){
         gc.strokeRect(x,y,x2,y2);
         gc.setStroke(color);
         gc.setLineWidth(1);
@@ -82,23 +82,23 @@ public class CaptureController implements Initializable{
         return (int) Screen.getPrimary().getBounds().getWidth();
     }
 
-    public void clearRect(){
+    public void clearRect(GraphicsContext gc){
         gc.clearRect(0,0,getWidthScreen(),getHeightScreen());
     }
 
     public void moveMouse(MouseEvent mouseEvent) {
         if  (isClicked) {
-            clearRect();
+            clearRect(this.gc);
             endX = MouseInfo.getPointerInfo().getLocation().x;
             endY = MouseInfo.getPointerInfo().getLocation().y;
-            drawRect(startX, startY, endX-startX, endY-startY);
+            drawRect(this.gc, startX, startY, endX-startX, endY-startY);
         }
     }
 
     public void pressMouseButton(MouseEvent mouseEvent) {
         if (!isClicked) {
             isClicked = true;
-            clearRect();
+            clearRect(this.gc);
             startX=MouseInfo.getPointerInfo().getLocation().x;
             startY=MouseInfo.getPointerInfo().getLocation().y;
         }
