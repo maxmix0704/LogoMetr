@@ -23,13 +23,13 @@
             </StackPane>
             <Accordion layoutX="364.0" layoutY="61.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
               <panes>
-                <TitledPane animated="false" onDragDetected="#pressBtn" text="Control">
+                <TitledPane animated="false" onDragDetected="#pressBtnCreateFrame" text="Control">
                   <content>
                     <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                            <children>
                               <VBox alignment="CENTER" layoutX="50.0" layoutY="3.0" prefHeight="157.0" prefWidth="100.0" spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                  <children>
-                                    <Button mnemonicParsing="false" onAction="#pressBtn" prefHeight="25.0" prefWidth="85.0" text="Create frame" />
+                                    <Button mnemonicParsing="false" onAction="#pressBtnCreateFrame" prefHeight="25.0" prefWidth="85.0" text="Create frame" />
                                     <Button mnemonicParsing="false" prefHeight="25.0" prefWidth="85.0" text="Check logo" />
                                     <Button mnemonicParsing="false" prefHeight="25.0" prefWidth="85.0" text="Save" />
                                  </children>

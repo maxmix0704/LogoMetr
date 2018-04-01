@@ -26,7 +26,7 @@ public class Controller {
     Button btn1;
 
     @FXML
-    public void pressBtn(ActionEvent event) {
+    public void pressBtnCreateFrame(ActionEvent event) {
         Stage stage = new Stage();
         FXMLLoader loader = new FXMLLoader(getClass().getResource("../fxml/CaptureWindow.fxml"));
         Parent root = null;
@@ -35,21 +35,20 @@ public class Controller {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        CaptureController personController = loader.getController();
-        stage.setScene(new Scene(root,personController.getWidthScreen(),personController.getHeightScreen()));
+        CaptureController controller = loader.getController();
+        stage.setScene(new Scene(root,controller.getWidthScreen(),controller.getHeightScreen()));
         stage.setX(0);
         stage.setY(0);
-        personController.canvas.setHeight(personController.getHeightScreen());
-        personController.canvas.setWidth(personController.getWidthScreen());
+        controller.canvas.setHeight(controller.getHeightScreen());
+        controller.canvas.setWidth(controller.getWidthScreen());
         stage.initModality(Modality.WINDOW_MODAL);
         stage.initStyle(StageStyle.UNDECORATED);
-        personController.setImage();
-//        personController.setFigure();
+        controller.setImage();
         stage.show();
         stage.getScene().setOnKeyPressed(new EventHandler<KeyEvent>() {
             public void handle(KeyEvent keyEvent) {
                 if (keyEvent.getCode() == KeyCode.ENTER) {
-                    imgViewMain.setImage(personController.grabScreenRegion(personController.startX,personController.startY,personController.endX,personController.endY));
+                    imgViewMain.setImage(controller.grabScreenRegion(controller.startX,controller.startY,controller.endX,controller.endY));
                     imgViewMain.setFitWidth(imgViewMain.getImage().getWidth());
                     imgViewMain.setFitHeight(imgViewMain.getImage().getHeight());
                     stage.close();
@@ -69,18 +68,5 @@ public class Controller {
             imgViewMain.setFitHeight(imgViewMain.getFitHeight()*1.1);
         }
     }
-
-
-//    public void initialize() {
-//        File file = new File("D:/2.gif");
-//        String localUrl = null;
-//        try {
-//            localUrl = file.toURI().toURL().toString();
-//        } catch (MalformedURLException e) {
-//            e.printStackTrace();
-//        }
-//        Image i = new Image(localUrl);
-//        imageFX.setImage(i);
-//    }
 
 }

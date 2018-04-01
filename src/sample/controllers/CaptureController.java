@@ -47,11 +47,11 @@ public class CaptureController implements Initializable{
     public void setImage(){
         imgView.setFitHeight(getHeightScreen());
         imgView.setFitWidth(getWidthScreen());
-        imgView.setImage(grabScreen());
+        imgView.setImage(grabScreenRegion(new Rectangle(Toolkit.getDefaultToolkit().getScreenSize())));
     }
-    public javafx.scene.image.Image grabScreen() {
+    public javafx.scene.image.Image grabScreenRegion(Rectangle rectangle) {
         try {
-            return SwingFXUtils.toFXImage(new Robot().createScreenCapture(new Rectangle(Toolkit.getDefaultToolkit().getScreenSize())), null);
+            return SwingFXUtils.toFXImage(new Robot().createScreenCapture(rectangle), null);
         } catch (SecurityException e) {
         } catch (AWTException e) {
         }
@@ -68,21 +68,9 @@ public class CaptureController implements Initializable{
         return null;
     }
 
-    public void setFigure(){
-        GraphicsContext gc = canvas.getGraphicsContext2D();
-//        gc.fillRect(30,30,100,100);
-//        gc.setFill(Color.RED);
-            gc.beginPath();
-            gc.moveTo(50, 50);
-            gc.bezierCurveTo(150, 20, 150, 150, 75, 150);
-            gc.closePath();
-    }
     public void drawRect(int x, int y, int x2, int y2){
-//        this.gc = canvas.getGraphicsContext2D();
         gc.strokeRect(x,y,x2,y2);
-        // draw the actual rectangle
         gc.setStroke(color);
-        // gc.setFill(model.background)
         gc.setLineWidth(1);
     }
 
@@ -98,8 +86,7 @@ public class CaptureController implements Initializable{
         gc.clearRect(0,0,getWidthScreen(),getHeightScreen());
     }
 
-    public void getMovedMousePosition(MouseEvent mouseEvent) {
-        System.out.println("MV"+MouseInfo.getPointerInfo().getLocation().toString());
+    public void moveMouse(MouseEvent mouseEvent) {
         if  (isClicked) {
             clearRect();
             endX = MouseInfo.getPointerInfo().getLocation().x;
@@ -108,8 +95,7 @@ public class CaptureController implements Initializable{
         }
     }
 
-    public void getStartMousePosition(MouseEvent mouseEvent) {
-        System.out.println("ST"+MouseInfo.getPointerInfo().getLocation().toString());
+    public void pressMouseButton(MouseEvent mouseEvent) {
         if (!isClicked) {
             isClicked = true;
             clearRect();
@@ -121,18 +107,9 @@ public class CaptureController implements Initializable{
         }
     }
 
-    public void getReleasedMousePosition(MouseEvent mouseEvent) {
-        System.out.println("RL"+MouseInfo.getPointerInfo().getLocation().toString());
-//        isClicked = false;
-    }
-
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         this.gc = canvas.getGraphicsContext2D();
-    }
-
-    public void pressEnter(KeyEvent keyEvent) {
-
     }
 
     public void setStage(Stage stage){
