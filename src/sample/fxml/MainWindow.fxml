@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.canvas.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
 <?import javafx.geometry.Rectangle2D?>
 <?import javafx.scene.canvas.Canvas?>
 <?import javafx.scene.control.Accordion?>
@@ -9,48 +15,52 @@
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<SplitPane dividerPositions="0.5" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="400.0" minWidth="600.0" orientation="VERTICAL" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.controllers.Controller">
+<SplitPane dividerPositions="0.6884422110552764" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="400.0" minWidth="600.0" orientation="VERTICAL" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.controllers.Controller">
   <items>
     <AnchorPane minHeight="80.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
          <children>
             <StackPane fx:id="stackPane" layoutX="81.0" layoutY="23.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="200.0" AnchorPane.topAnchor="0.0">
                <children>
-                  <ImageView fx:id="imgViewMain" fitHeight="100.0" fitWidth="100.0" nodeOrientation="INHERIT" pickOnBounds="true" preserveRatio="true">
+                  <ImageView fx:id="imgViewMain" fitHeight="200.0" fitWidth="200.0" nodeOrientation="INHERIT" pickOnBounds="true" preserveRatio="true">
                      <viewport>
                         <Rectangle2D />
                      </viewport>
+                     <image>
+                        <Image url="@../img/600px-No_image_available.svg.png" />
+                     </image>
                   </ImageView>
-                  <Canvas fx:id="canvasMain" height="100.0" nodeOrientation="INHERIT" onKeyPressed="#pressEnter" onMouseMoved="#movedMouseMain" onMousePressed="#pressMouseMain" onScroll="#scrollMouse" width="100.0" />
+                  <Canvas fx:id="canvasMain" height="200.0" nodeOrientation="INHERIT" onKeyPressed="#pressEnter" onMouseMoved="#movedMouseMain" onMousePressed="#pressMouseMain" onScroll="#scrollMouse" width="200.0" />
                </children>
             </StackPane>
-            <Accordion layoutX="364.0" layoutY="61.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <Accordion fx:id="accord" layoutX="364.0" layoutY="61.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
               <panes>
-                <TitledPane animated="false" onDragDetected="#pressBtnCreateFrame" text="Control">
+                <TitledPane fx:id="titledPane1" animated="false" text="Control">
                   <content>
                     <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                            <children>
                               <VBox alignment="CENTER" layoutX="50.0" layoutY="3.0" prefHeight="157.0" prefWidth="100.0" spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                  <children>
-                                    <Button mnemonicParsing="false" onAction="#pressBtnCreateFrame" prefHeight="25.0" prefWidth="85.0" text="Create frame" />
-                                    <Button mnemonicParsing="false" onAction="#checkLogo" prefHeight="25.0" prefWidth="85.0" text="Check logo" />
-                                    <Button mnemonicParsing="false" prefHeight="25.0" prefWidth="85.0" text="Save" />
+                                    <Button fx:id="btnCreate" mnemonicParsing="false" onAction="#pressBtnCreateFrame" prefHeight="25.0" prefWidth="85.0" text="Create frame" />
+                                    <Button fx:id="btnCheck" mnemonicParsing="false" onAction="#checkLogo" prefHeight="25.0" prefWidth="85.0" text="Check logo" />
+                                    <Button fx:id="btnSave" mnemonicParsing="false" prefHeight="25.0" prefWidth="85.0" text="Save" />
                                  </children>
                               </VBox>
                            </children>
                         </AnchorPane>
                   </content>
                 </TitledPane>
-                <TitledPane animated="false" text="Tools">
+                <TitledPane fx:id="titledPane2" animated="false" text="Tools">
                   <content>
                     <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
                   </content>
                 </TitledPane>
-                <TitledPane animated="false" text="Database">
+                <TitledPane fx:id="titledPane3" animated="false" text="Database">
                   <content>
                     <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
                   </content>

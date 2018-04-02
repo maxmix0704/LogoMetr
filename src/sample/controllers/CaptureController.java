@@ -33,10 +33,10 @@ public class CaptureController implements Initializable{
 
     Stage captureStage;
 
-     int startX;
-     int startY;
-     int endX;
-     int endY;
+     double startX;
+     double startY;
+     double endX;
+     double endY;
 
     public GraphicsContext gc;
 
@@ -68,10 +68,12 @@ public class CaptureController implements Initializable{
         return null;
     }
 
-    public void drawRect(GraphicsContext gc, int x, int y, int x2, int y2){
+    public void drawRect(GraphicsContext gc, Color color, double x, double y, double x2, double y2){
         gc.strokeRect(x,y,x2,y2);
         gc.setStroke(color);
         gc.setLineWidth(1);
+        gc.setLineDashes(10);
+        gc.setLineDashOffset(3);
     }
 
     public int getHeightScreen(){
@@ -91,7 +93,7 @@ public class CaptureController implements Initializable{
             clearRect(this.gc);
             endX = MouseInfo.getPointerInfo().getLocation().x;
             endY = MouseInfo.getPointerInfo().getLocation().y;
-            drawRect(this.gc, startX, startY, endX-startX, endY-startY);
+            drawRect(this.gc,color, startX, startY, endX-startX, endY-startY);
         }
     }
 

@@ -15,7 +15,7 @@ public class Main extends Application {
     public void start(Stage primaryStage) throws Exception{
         this.primaryStage = primaryStage;
         Parent root = FXMLLoader.load(getClass().getResource("../fxml/MainWindow.fxml"));
-        primaryStage.setTitle("Hello World");
+        primaryStage.setTitle("LogoMetr");
         primaryStage.setScene(new Scene(root, 600, 400));
         primaryStage.setMinHeight(420);
         primaryStage.setMinWidth(640);
