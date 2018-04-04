@@ -10,9 +10,8 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.control.Accordion;
-import javafx.scene.control.Button;
-import javafx.scene.control.TitledPane;
+import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -23,16 +22,42 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.*;
+import sample.dao.DAOFactory;
+import sample.dao.interfaces.LogoDAO;
+import sample.entity.Logo;
+import sample.dao.impl.CollectionLogoDAO;
 import sample.start.Main;
+import sample.utils.EventTypeLogo;
 
 
 import java.io.IOException;
 import java.net.URL;
+import java.sql.Connection;
 import java.util.Formatter;
 import java.util.ResourceBundle;
 
 
 public class Controller implements Initializable{
+
+    private static String TEST_DATA_SQL = "INSERT INTO public.logo(" +
+            "\tnameproduct, idbase, sizelogo, type_event, date)" +
+            "\tVALUES ('Rozetka', 2194, 33.5, 'PANE', '04/03/18');" +
+            "\t\n" +
+            "INSERT INTO public.logo(" +
+            "\tnameproduct, idbase, sizelogo, type_event, date)" +
+            "\tVALUES ('Coca Cola', 2195, 10.2, 'LOGO', '05/03/18');" +
+            "\t\n" +
+            "INSERT INTO public.logo(" +
+            "\tnameproduct, idbase, sizelogo, type_event, date)" +
+            "\tVALUES ('Onkyo', 2193, 1.2, 'LOGO', '05/03/18'" +
+            "\n" +
+            "INSERT INTO public.logo(\n" +
+            "\tnameproduct, idbase, sizelogo, type_event, date)\n" +
+            "\tVALUES ('BMW', 4215, 15, 'PANE', '15/03/18');" +
+            "\t\n" +
+            "INSERT INTO public.logo(\n" +
+            "\tnameproduct, idbase, sizelogo, type_event, date)" +
+            "\tVALUES ('Microsof', 1252, 17, 'PANE', '01/03/18');";
 
     @FXML
     public ImageView imgViewMain;
@@ -47,13 +72,26 @@ public class Controller implements Initializable{
     public TitledPane titledPane3;
     public Accordion accord;
 
+    public TableView tableView;
+    public TableColumn<Logo,Integer> id;
+    public TableColumn<Logo,String> productName;
+    public TableColumn<Logo,Integer> idBase;
+    public TableColumn<Logo,Double> size;
+    public TableColumn<Logo,String> date;
+    public TableColumn<Logo,EventTypeLogo> eventTypeLogo;
+
     @FXML
     Canvas canvasMain;
 
-    Stage stage;
+    Stage captureStage;
     Stage primaryStage;
+    static Stage dialogStage;
 
-    CaptureController controller;
+
+    CaptureController captureController;
+    DialogWindowController dialogWindowController;
+
+    CollectionLogoDAO logoDao;
 
     Parent root;
 
@@ -64,44 +102,50 @@ public class Controller implements Initializable{
 
     GraphicsContext gc;
 
-    double startX;
-    double startY;
-    double endX;
-    double endY;
+    float startX;
+    float startY;
+    float endX;
+    float endY;
 
-    double logoSize = 0;
-    private static Color COLOR_TEXT_PERCENT_OF_LOGO = Color.rgb(20,194,46,0.9);
+    private static float logoSize = 0;
+
+    DAOFactory daoFactory;
+    Connection connection;
+    LogoDAO dao;
+
+    private static Color COLOR_TEXT_PERCENT_OF_LOGO = Color.rgb(141,19,144, 1);
     private static Color COLOR_TEXT_SELECT_FRAME = Color.rgb(49,38,255,0.9);
     private static Color COLOR_TEXT_SELECT_LOGO = Color.rgb(49,38,255,0.9);
-    private static Color COLOR_FRAME_OF_LOGO = Color.rgb(255,157,14,0.8);
+    private static Color COLOR_FRAME_OF_LOGO = Color.rgb(255,117,4,0.8);
 
     @FXML
     public void pressBtnCreateFrame(ActionEvent event) {
         primaryStage.hide();
-        controller.clearRect(controller.gc);
+        captureController.clearRect(captureController.gc);
+        captureController.clearRect(this.gc);
         try {
             Thread.sleep(500);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        stage.show();
-        controller.setImage();
-        showText(controller.gc,"%s","Hightline the frame",100, COLOR_TEXT_SELECT_FRAME);
-        controller.setImage();
-        stage.getScene().setOnKeyPressed(new EventHandler<KeyEvent>() {
+        captureStage.show();
+        captureController.setScreenCapture();
+        showText(captureController.gc,"%s","Hightline the frame",100, COLOR_TEXT_SELECT_FRAME);
+        captureController.setScreenCapture();
+        captureStage.getScene().setOnKeyPressed(new EventHandler<KeyEvent>() {
             public void handle(KeyEvent keyEvent) {
                 if (keyEvent.getCode() == KeyCode.ENTER) {
-                    imgViewMain.setImage(controller.grabScreenRegion((int) controller.startX,(int) controller.startY,(int) controller.endX,(int) controller.endY));
+                    imgViewMain.setImage(captureController.grabScreenRegion((int) captureController.startX,(int) captureController.startY,(int) captureController.endX,(int) captureController.endY));
                     imgViewMain.setFitWidth(imgViewMain.getImage().getWidth());
                     imgViewMain.setFitHeight(imgViewMain.getImage().getHeight());
                     canvasMain.setHeight(imgViewMain.getImage().getHeight());
                     canvasMain.setWidth(imgViewMain.getImage().getWidth());
-                    stage.hide();
+                    captureStage.hide();
                     btnCheck.setDisable(false);
                     primaryStage.show();
                 }
                 if (keyEvent.getCode() == KeyCode.ESCAPE){
-                    stage.hide();
+                    captureStage.hide();
                     primaryStage.show();
                 }
             }
@@ -109,8 +153,8 @@ public class Controller implements Initializable{
     }
 
     public void scrollMouse(ScrollEvent scrollEvent) {
-        double width = imgViewMain.getFitWidth();
-        double height = imgViewMain.getFitHeight();
+        float width = (float)imgViewMain.getFitWidth();
+        float height = (float)imgViewMain.getFitHeight();
         if (scrollEvent.getDeltaY()>0){
             width*=0.9;
             height*=0.9;
@@ -133,18 +177,16 @@ public class Controller implements Initializable{
         canvasMain.setWidth(width);
         canvasMain.setHeight(height);
         if (isPressCheck&&!isClicked){
-            controller.clearRect(gc);
-            controller.drawRect(this.gc,COLOR_FRAME_OF_LOGO, startX, startY, endX-startX, endY-startY);
+            captureController.redrawRect(this.gc,COLOR_FRAME_OF_LOGO,startX, startY, endX-startX, endY-startY);
         }
         if (isCalcSize) showText(gc,"%.2f%%",logoSize,35,COLOR_TEXT_PERCENT_OF_LOGO);
     }
 
     public void movedMouseMain(MouseEvent mouseEvent) {
         if  (isClicked&&isPressCheck) {
-            controller.clearRect(this.gc);
             endX = (int) mouseEvent.getX();
             endY = (int) mouseEvent.getY();
-            controller.drawRect(this.gc,COLOR_FRAME_OF_LOGO,startX, startY, endX-startX, endY-startY);
+            captureController.redrawRect(this.gc,COLOR_FRAME_OF_LOGO,startX, startY, endX-startX, endY-startY);
             gc.strokeRect(startX,startY,endX-startX,endY-startY);
         }
     }
@@ -153,7 +195,7 @@ public class Controller implements Initializable{
         if (!isClicked&&isPressCheck) {
             isClicked = true;
             isCalcSize = false;
-            controller.clearRect(this.gc);
+            captureController.clearRect(this.gc);
             startX= (int) mouseEvent.getX();
             startY= (int) mouseEvent.getY();
         }
@@ -161,31 +203,56 @@ public class Controller implements Initializable{
             isClicked=false;
             canvasMain.requestFocus();
         }
+        btnSave.setDisable(true);
     }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        this.daoFactory = DAOFactory.getDAOFactory(DAOFactory.POSTGRESQL);
+        this.connection = daoFactory.createConnection();
+        this.dao = daoFactory.getLogoDAO();
+        updateTable();
+
+        id.setCellValueFactory(new PropertyValueFactory<Logo, Integer>("id"));
+        productName.setCellValueFactory(new PropertyValueFactory<Logo, String>("productName"));
+        idBase.setCellValueFactory(new PropertyValueFactory<Logo, Integer>("idBase"));
+        date.setCellValueFactory(new PropertyValueFactory<Logo, String>("date"));
+        size.setCellValueFactory(new PropertyValueFactory<Logo, Double>("size"));
+        eventTypeLogo.setCellValueFactory(new PropertyValueFactory<Logo, EventTypeLogo>("eventTypeLogo"));
         this.primaryStage = Main.getPrimaryStage();
-        this.stage = new Stage();
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("../fxml/CaptureWindow.fxml"));
+
+        this.captureStage = new Stage();
+        FXMLLoader loader1 = new FXMLLoader(getClass().getResource("../fxml/CaptureWindow.fxml"));
         this.root = null;
         try {
-            root = loader.load();
+            root = loader1.load();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        this.controller = loader.getController();
-        stage.setScene(new Scene(root,controller.getWidthScreen(),controller.getHeightScreen()));
-        stage.setX(0);
-        stage.setY(0);
-        controller.canvas.setHeight(controller.getHeightScreen());
-        controller.canvas.setWidth(controller.getWidthScreen());
-        stage.initModality(Modality.WINDOW_MODAL);
-        stage.initStyle(StageStyle.UNDECORATED);
+        this.captureController = loader1.getController();
+
+        this.dialogStage = new Stage();
+        FXMLLoader loader2 = new FXMLLoader(getClass().getResource("../fxml/DialogWindow.fxml"));
+        this.root = null;
+        try {
+            root = loader2.load();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        dialogStage.setScene(new Scene(loader2.getRoot()));
+
+        captureStage.setScene(new Scene(loader1.getRoot(), captureController.getWidthScreen(), captureController.getHeightScreen()));
+        captureStage.setX(0);
+        captureStage.setY(0);
+        captureController.canvas.setHeight(captureController.getHeightScreen());
+        captureController.canvas.setWidth(captureController.getWidthScreen());
+        captureStage.initModality(Modality.WINDOW_MODAL);
+        captureStage.initStyle(StageStyle.UNDECORATED);
         this.gc=canvasMain.getGraphicsContext2D();
         btnCheck.setDisable(true);
         btnSave.setDisable(true);
         accord.setExpandedPane(titledPane1);
+        this.logoDao = new CollectionLogoDAO();
     }
 
 
@@ -198,6 +265,7 @@ public class Controller implements Initializable{
             logoSize=getLogoSize();
             isCalcSize = true;
             showText(this.gc,"%.2f%%",logoSize,35,COLOR_TEXT_PERCENT_OF_LOGO);
+            btnSave.setDisable(false);
         }
     }
 
@@ -221,9 +289,40 @@ public class Controller implements Initializable{
         showText(this.gc,"%s","Hightline the logo", 25,COLOR_TEXT_SELECT_LOGO);
     }
 
-    public double getLogoSize(){
-        double sizeFrame = (canvasMain.getHeight()*canvasMain.getWidth());
-        double sizeLogo = (endX-startX)*(endY-startY);
+    public float getLogoSize(){
+        float sizeFrame = (float) (canvasMain.getHeight()*canvasMain.getWidth());
+        float sizeLogo = (endX-startX)*(endY-startY);
         return (sizeLogo*100)/sizeFrame;
+    }
+
+    public static float getSize(){
+        return logoSize;
+    }
+//    public void saveLogo(ActionEvent event) {
+//        EventTypeLogo eventTypeLogo = EventTypeLogo.LOGO;
+//        if (logoSize>12) eventTypeLogo = EventTypeLogo.PANE;
+//        Logo logo = new Logo();
+//        logo.setId(1);
+//        logo.setProductName("Rozetka");
+//        logo.setIdBase(1444);
+//        logo.setSize(logoSize);
+//        logo.setEventTypeLogo(eventTypeLogo);
+//        logo.setImage(imgViewMain.getImage());
+//        logo.setDate(new Date().toString());
+//        logoDao.insert(logo);
+//        updateTable();
+//    }
+
+    public void saveLogo(ActionEvent event){
+        dialogStage.setTitle("Save");
+        dialogStage.show();
+    }
+
+    public void updateTable() {
+        tableView.setItems(dao.getAll());
+    }
+
+    public static Stage getDialogStage(){
+        return dialogStage;
     }
 }

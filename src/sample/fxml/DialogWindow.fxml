@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<AnchorPane prefHeight="150.0" prefWidth="300.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.controllers.DialogWindowController">
+   <children>
+      <BorderPane prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <bottom>
+            <HBox prefHeight="45.0" prefWidth="210.0" spacing="50.0" BorderPane.alignment="CENTER">
+               <children>
+                   <Button cacheShape="false" mnemonicParsing="false" onAction="#saveButton" prefHeight="25.0" prefWidth="70.0" text="Save" />
+                  <Button  cancelButton="true" mnemonicParsing="false" prefHeight="25.0" prefWidth="70.0" text="Cancel" />
+               </children>
+               <BorderPane.margin>
+                  <Insets left="55.0" right="30.0" />
+               </BorderPane.margin>
+            </HBox>
+         </bottom>
+         <center>
+            <HBox prefHeight="100.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+               <children>
+                  <VBox prefHeight="55.0" prefWidth="109.0" spacing="17.0">
+                     <children>
+                        <Label prefHeight="17.0" prefWidth="105.0" text="Product name">
+                           <VBox.margin>
+                              <Insets left="5.0" />
+                           </VBox.margin>
+                        </Label>
+                        <Label text="id in the database">
+                           <VBox.margin>
+                              <Insets left="5.0" />
+                           </VBox.margin>
+                        </Label>
+                     </children>
+                     <HBox.margin>
+                        <Insets bottom="20.0" left="15.0" top="25.0" />
+                     </HBox.margin>
+                  </VBox>
+                  <VBox prefHeight="100.0" prefWidth="157.0" spacing="10.0">
+                     <children>
+                        <TextField fx:id="productNameField" prefHeight="25.0" prefWidth="145.0" />
+                        <TextField fx:id="idBaseField" />
+                     </children>
+                     <HBox.margin>
+                        <Insets bottom="20.0" right="20.0" top="20.0" />
+                     </HBox.margin>
+                  </VBox>
+               </children>
+            </HBox>
+         </center>
+      </BorderPane>
+   </children>
+</AnchorPane>

@@ -5,8 +5,12 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import sample.dao.DAOFactory;
+import sample.dao.factory.PostgreSQLDAOFactory;
+import sample.dao.impl.PostgresLogoDAO;
 
 import java.awt.*;
+import java.sql.Connection;
 
 public class Main extends Application {
 

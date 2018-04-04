@@ -33,10 +33,10 @@ public class CaptureController implements Initializable{
 
     Stage captureStage;
 
-     double startX;
-     double startY;
-     double endX;
-     double endY;
+    float startX;
+    float startY;
+    float endX;
+    float endY;
 
     public GraphicsContext gc;
 
@@ -44,7 +44,7 @@ public class CaptureController implements Initializable{
 
     Color color = Color.RED;
 
-    public void setImage(){
+    public void setScreenCapture(){
         imgView.setFitHeight(getHeightScreen());
         imgView.setFitWidth(getWidthScreen());
         imgView.setImage(grabScreenRegion(new Rectangle(Toolkit.getDefaultToolkit().getScreenSize())));
@@ -68,12 +68,21 @@ public class CaptureController implements Initializable{
         return null;
     }
 
-    public void drawRect(GraphicsContext gc, Color color, double x, double y, double x2, double y2){
+    public void drawRect(GraphicsContext gc, Color color, float x, float y, float x2, float y2){
         gc.strokeRect(x,y,x2,y2);
         gc.setStroke(color);
         gc.setLineWidth(1);
         gc.setLineDashes(10);
         gc.setLineDashOffset(3);
+    }
+
+    public void clearRect(GraphicsContext gc){
+        gc.clearRect(0,0,gc.getCanvas().getWidth(),gc.getCanvas().getHeight());
+    }
+
+    public void redrawRect(GraphicsContext gc, Color color, float x, float y, float x2, float y2){
+        clearRect(gc);
+        drawRect(gc,color,x,y,x2,y2);
     }
 
     public int getHeightScreen(){
@@ -84,16 +93,11 @@ public class CaptureController implements Initializable{
         return (int) Screen.getPrimary().getBounds().getWidth();
     }
 
-    public void clearRect(GraphicsContext gc){
-        gc.clearRect(0,0,getWidthScreen(),getHeightScreen());
-    }
-
     public void moveMouse(MouseEvent mouseEvent) {
         if  (isClicked) {
-            clearRect(this.gc);
             endX = MouseInfo.getPointerInfo().getLocation().x;
             endY = MouseInfo.getPointerInfo().getLocation().y;
-            drawRect(this.gc,color, startX, startY, endX-startX, endY-startY);
+            redrawRect(this.gc,color, startX, startY, endX-startX, endY-startY);
         }
     }
 
