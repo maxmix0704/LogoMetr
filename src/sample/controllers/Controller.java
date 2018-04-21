@@ -90,6 +90,7 @@ public class Controller implements Initializable{
 
     CaptureController captureController;
     DialogWindowController dialogWindowController;
+    Controller controller;
 
     CollectionLogoDAO logoDao;
 
@@ -112,6 +113,8 @@ public class Controller implements Initializable{
     DAOFactory daoFactory;
     Connection connection;
     LogoDAO dao;
+
+    public static Logo editLogo;
 
     private static Color COLOR_TEXT_PERCENT_OF_LOGO = Color.rgb(141,19,144, 1);
     private static Color COLOR_TEXT_SELECT_FRAME = Color.rgb(49,38,255,0.9);
@@ -239,7 +242,11 @@ public class Controller implements Initializable{
         } catch (IOException e) {
             e.printStackTrace();
         }
+        this.dialogWindowController = loader2.getController();
         dialogStage.setScene(new Scene(loader2.getRoot()));
+        dialogStage.initModality(Modality.WINDOW_MODAL);
+        dialogStage.setResizable(false);
+        dialogStage.initOwner(primaryStage);
 
         captureStage.setScene(new Scene(loader1.getRoot(), captureController.getWidthScreen(), captureController.getHeightScreen()));
         captureStage.setX(0);
@@ -247,6 +254,7 @@ public class Controller implements Initializable{
         captureController.canvas.setHeight(captureController.getHeightScreen());
         captureController.canvas.setWidth(captureController.getWidthScreen());
         captureStage.initModality(Modality.WINDOW_MODAL);
+        captureStage.initOwner(primaryStage);
         captureStage.initStyle(StageStyle.UNDECORATED);
         this.gc=canvasMain.getGraphicsContext2D();
         btnCheck.setDisable(true);
@@ -315,7 +323,8 @@ public class Controller implements Initializable{
 
     public void saveLogo(ActionEvent event){
         dialogStage.setTitle("Save");
-        dialogStage.show();
+        dialogWindowController.btnDialogWindow.setText("Save");
+        dialogStage.showAndWait();
     }
 
     public void updateTable() {
@@ -324,5 +333,20 @@ public class Controller implements Initializable{
 
     public static Stage getDialogStage(){
         return dialogStage;
+    }
+
+    public void editLogo(ActionEvent event) {
+        dialogStage.setTitle("Edit");
+        dialogWindowController.btnDialogWindow.setText("Edit");
+        Logo logo = (Logo) tableView.getSelectionModel().getSelectedItem();
+        dialogWindowController.productNameField.setText(logo.getProductName());
+        dialogWindowController.idBaseField.setText(Integer.toString(logo.getIdBase()));
+        this.editLogo = logo;
+        dialogStage.showAndWait();
+    }
+
+    public void deleteLogo(ActionEvent event) {
+        dao.delete((Logo) tableView.getSelectionModel().getSelectedItem());
+        updateTable();
     }
 }

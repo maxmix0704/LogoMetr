@@ -12,6 +12,7 @@ import javafx.stage.Stage;
 import sample.dao.DAOFactory;
 import sample.dao.interfaces.LogoDAO;
 import sample.entity.Logo;
+import sample.start.Main;
 import sample.utils.EventTypeLogo;
 
 import java.io.IOException;
@@ -23,16 +24,18 @@ import java.util.ResourceBundle;
 public class DialogWindowController implements Initializable {
 
 
-    Controller controller;
     Stage stage;
-    Parent root;
 
     DAOFactory daoFactory;
     Connection connection;
     LogoDAO dao;
+    FXMLLoader loader;
+    Controller controller;
 
     @FXML
     public TextField productNameField;
+    @FXML
+    public Button btnDialogWindow;
     @FXML
     public TextField idBaseField;
 
@@ -41,34 +44,39 @@ public class DialogWindowController implements Initializable {
     }
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-//        this.stage = new Stage();
-//        FXMLLoader loader = new FXMLLoader(getClass().getResource("../fxml/CaptureWindow.fxml"));
-//        this.root = null;
-//        try {
-//            root = loader.load();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//        this.controller = loader.getController();
-//        stage.setScene(new Scene(root));
-
         this.daoFactory = DAOFactory.getDAOFactory(DAOFactory.POSTGRESQL);
         this.connection = daoFactory.createConnection();
         this.dao = daoFactory.getLogoDAO();
         this.stage=Controller.getDialogStage();
+        this.loader=Main.getLoader();
+        controller=loader.getController();
     }
 
     public void saveButton(ActionEvent event) {
-        Logo logo = new Logo();
-        if (Controller.getSize()>12)
-            logo.setEventTypeLogo(EventTypeLogo.PANE);
-        else
-            logo.setEventTypeLogo(EventTypeLogo.LOGO);
-        logo.setIdBase(Integer.parseInt(idBaseField.getText()));
-        logo.setDate(new Date().toString());
-        logo.setProductName(productNameField.getText());
-        logo.setSize(Controller.getSize());
-        dao.insert(logo);
+        Logo editLogo = new Logo();
+        switch (btnDialogWindow.getText()){
+            case "Save":
+                if (Controller.getSize()>12)
+                    editLogo.setEventTypeLogo(EventTypeLogo.PANE);
+                else
+                    editLogo.setEventTypeLogo(EventTypeLogo.LOGO);
+                editLogo.setDate(new Date().toString());
+                editLogo.setProductName(productNameField.getText());
+                editLogo.setSize(Controller.getSize());
+                dao.insert(editLogo);
+            case "Edit":
+                editLogo.setProductName(productNameField.getText());
+                editLogo.setIdBase(Integer.parseInt(idBaseField.getText()));
+                editLogo.setId(Controller.editLogo.getId());
+                dao.update(editLogo);
+        }
+        this.stage.hide();
+        idBaseField.setText("");
+        productNameField.setText("");
+        controller.updateTable();
+    }
+
+    public void pressCancel(ActionEvent event) {
         this.stage.hide();
         idBaseField.setText("");
         productNameField.setText("");

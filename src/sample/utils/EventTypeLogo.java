@@ -14,10 +14,10 @@ public enum EventTypeLogo {
     }
 
     public static EventTypeLogo getEventType(String s){
-        if (s=="LOGO")
+        if (s.contains("LOGO"))
             return EventTypeLogo.LOGO;
-            else
-                return  EventTypeLogo.PANE;
+        else
+            return EventTypeLogo.PANE;
 
     }
 }
