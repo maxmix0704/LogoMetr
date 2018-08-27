@@ -1,5 +1,7 @@
 package sample.controllers;
 
+import com.sun.prism.impl.PrismSettings;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -8,11 +10,14 @@ import javafx.fxml.Initializable;
 import javafx.geometry.VPos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.SnapshotParameters;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
+import javafx.scene.control.Button;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.image.ImageView;
+import javafx.scene.image.*;
+import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
@@ -21,6 +26,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
+import javafx.scene.transform.Transform;
 import javafx.stage.*;
 import sample.dao.DAOFactory;
 import sample.dao.interfaces.LogoDAO;
@@ -30,10 +36,14 @@ import sample.start.Main;
 import sample.utils.EventTypeLogo;
 
 
-import java.io.IOException;
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.*;
 import java.math.BigDecimal;
 import java.net.URL;
 import java.sql.Connection;
+import java.sql.SQLOutput;
 import java.util.Formatter;
 import java.util.ResourceBundle;
 
@@ -364,7 +374,7 @@ public class Controller implements Initializable{
     }
 
     public void showImage(ActionEvent event){
-        imgViewMain.setImage(dao.find(1).getImage());
+        getResultImage();
     }
 
     public void dblClick(MouseEvent mouseEvent) {
@@ -377,7 +387,43 @@ public class Controller implements Initializable{
         }
     }
 
+    public Image getResultImage(){
+        Image image = imgViewMain.getImage();
+
+        SnapshotParameters params = new SnapshotParameters();
+        params.setFill(Color.TRANSPARENT);
+        Image snapshot = canvasMain.snapshot(params, null);
+
+        BufferedImage bImage = SwingFXUtils.fromFXImage(snapshot, null);
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        InputStream inputStream;
+        try {
+            ImageIO.write(bImage, "png", outputStream);
+            byte[] res  = outputStream.toByteArray();
+            inputStream = new ByteArrayInputStream(res);
+            snapshot = new Image(inputStream,image.getWidth(),image.getHeight(),false,false);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        PixelReader pixelReaderCanvas =  snapshot.getPixelReader();
+        PixelReader pixelReaderImgView = image.getPixelReader();
+
+        WritableImage writableImage =
+                new WritableImage(pixelReaderImgView,(int)imgViewMain.getImage().getWidth(),(int)imgViewMain.getImage().getHeight());
+        PixelWriter pixelWriter = writableImage.getPixelWriter();
+        for(int y=0; y<image.getHeight(); y++){
+            for(int x=0; x<image.getWidth(); x++){
+                Color color = pixelReaderCanvas.getColor(x, y);
+                if (!color.equals(Color.TRANSPARENT))
+                pixelWriter.setColor(x, y, color);
+            }
+        }
+        return writableImage;
+    }
+
     public void clearRect(){
         captureController.clearRect(this.gc);
     }
+
 }

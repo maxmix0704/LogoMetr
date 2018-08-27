@@ -65,7 +65,8 @@ public class DialogWindowController implements Initializable {
                 editLogo.setProductName(productNameField.getText());
                 editLogo.setIdBase(Integer.parseInt(idBaseField.getText()));
                 editLogo.setSize(Controller.getSize());
-                editLogo.setImage(controller.imgViewMain.getImage());
+//                editLogo.setImage(controller.imgViewMain.getImage());
+                editLogo.setImage(controller.getResultImage());
                 dao.insert(editLogo);
                 break;
             case "Edit":
