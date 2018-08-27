@@ -31,6 +31,7 @@ import sample.utils.EventTypeLogo;
 
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.net.URL;
 import java.sql.Connection;
 import java.util.Formatter;
@@ -79,6 +80,7 @@ public class Controller implements Initializable{
     public TableColumn<Logo,Double> size;
     public TableColumn<Logo,String> date;
     public TableColumn<Logo,EventTypeLogo> eventTypeLogo;
+    public Button show;
 
     @FXML
     Canvas canvasMain;
@@ -100,8 +102,9 @@ public class Controller implements Initializable{
     Boolean isPressCheck =false;
     Boolean isCalcSize = false;
     Boolean isFrameCreate = false;
+    Boolean isRectCreate = false;
 
-    GraphicsContext gc;
+    public static GraphicsContext gc;
 
     float startX;
     float startY;
@@ -153,6 +156,8 @@ public class Controller implements Initializable{
                 }
             }
         });
+        isPressCheck=false;
+        isCalcSize=false;
     }
 
     public void scrollMouse(ScrollEvent scrollEvent) {
@@ -179,14 +184,15 @@ public class Controller implements Initializable{
         imgViewMain.setFitHeight(height);
         canvasMain.setWidth(width);
         canvasMain.setHeight(height);
-        if (isPressCheck&&!isClicked){
-            captureController.redrawRect(this.gc,COLOR_FRAME_OF_LOGO,startX, startY, endX-startX, endY-startY);
-        }
-        if (isCalcSize) showText(gc,"%.2f%%",logoSize,35,COLOR_TEXT_PERCENT_OF_LOGO);
+            if (isPressCheck && !isClicked) {
+                captureController.redrawRect(this.gc, COLOR_FRAME_OF_LOGO, startX, startY, endX - startX, endY - startY);
+                if (isCalcSize) showText(gc, "%.2f%%", logoSize, 35, COLOR_TEXT_PERCENT_OF_LOGO);
+            }
     }
 
     public void movedMouseMain(MouseEvent mouseEvent) {
         if  (isClicked&&isPressCheck) {
+            isRectCreate =true;
             endX = (int) mouseEvent.getX();
             endY = (int) mouseEvent.getY();
             captureController.redrawRect(this.gc,COLOR_FRAME_OF_LOGO,startX, startY, endX-startX, endY-startY);
@@ -266,7 +272,7 @@ public class Controller implements Initializable{
 
     public void pressEnter(KeyEvent keyEvent) {
         if (keyEvent.getCode() == KeyCode.ENTER) {
-            System.out.printf("%.2f%%",getLogoSize());
+            System.out.println(getLogoSize());
             System.out.println();
             System.out.println("Frame="+canvasMain.getHeight()*canvasMain.getWidth());
             System.out.println("Logo="+(endX-startX)*(endY-startY));
@@ -304,8 +310,15 @@ public class Controller implements Initializable{
     }
 
     public static float getSize(){
-        return logoSize;
+        return round(logoSize,2);
     }
+
+    public static float round(float d, int decimalPlace) {
+        BigDecimal bd = new BigDecimal(Float.toString(d));
+        bd = bd.setScale(decimalPlace, BigDecimal.ROUND_HALF_UP);
+        return bd.floatValue();
+    }
+
 //    public void saveLogo(ActionEvent event) {
 //        EventTypeLogo eventTypeLogo = EventTypeLogo.LOGO;
 //        if (logoSize>12) eventTypeLogo = EventTypeLogo.PANE;
@@ -348,5 +361,23 @@ public class Controller implements Initializable{
     public void deleteLogo(ActionEvent event) {
         dao.delete((Logo) tableView.getSelectionModel().getSelectedItem());
         updateTable();
+    }
+
+    public void showImage(ActionEvent event){
+        imgViewMain.setImage(dao.find(1).getImage());
+    }
+
+    public void dblClick(MouseEvent mouseEvent) {
+        if (mouseEvent.getClickCount() == 2){
+            isPressCheck=false;
+            captureController.clearRect(gc);
+            Logo logo = (Logo) tableView.getSelectionModel().getSelectedItem();
+            imgViewMain.setImage(dao.find(logo.getId()).getImage());
+            System.out.println(logo.getId());
+        }
+    }
+
+    public void clearRect(){
+        captureController.clearRect(this.gc);
     }
 }

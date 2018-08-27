@@ -1,6 +1,7 @@
 package sample.entity;
 
 import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleFloatProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.scene.image.Image;
@@ -10,7 +11,7 @@ public class Logo {
     private SimpleIntegerProperty id = new SimpleIntegerProperty(0);
     private SimpleStringProperty productName = new SimpleStringProperty("");
     private SimpleIntegerProperty idBase = new SimpleIntegerProperty(0);
-    private SimpleDoubleProperty size = new SimpleDoubleProperty(0);
+    private SimpleFloatProperty size = new SimpleFloatProperty(0);
     private EventTypeLogo eventTypeLogo;
     private SimpleStringProperty date = new SimpleStringProperty("1/01/2018");
 
@@ -18,7 +19,7 @@ public class Logo {
 
     public Logo(){}
 
-    public Logo(SimpleIntegerProperty id, SimpleStringProperty productName, SimpleIntegerProperty idDatabase, SimpleDoubleProperty sizeLogo, EventTypeLogo eventTypeLogo, SimpleStringProperty date) {
+    public Logo(SimpleIntegerProperty id, SimpleStringProperty productName, SimpleIntegerProperty idDatabase, SimpleFloatProperty sizeLogo, EventTypeLogo eventTypeLogo, SimpleStringProperty date) {
         this.id = id;
         this.productName = productName;
         this.idBase = idDatabase;
@@ -67,11 +68,11 @@ public class Logo {
         return size.get();
     }
 
-    public SimpleDoubleProperty sizeProperty() {
+    public SimpleFloatProperty sizeProperty() {
         return size;
     }
 
-    public void setSize(double size) {
+    public void setSize(float size) {
         this.size.set(size);
     }
 

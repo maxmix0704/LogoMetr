@@ -57,7 +57,10 @@
                 </TitledPane>
                 <TitledPane fx:id="titledPane2" animated="false" text="Tools">
                   <content>
-                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                           <children>
+                              <Button fx:id="show" layoutX="74.0" layoutY="85.0" mnemonicParsing="false" onAction="#showImage" text="ShowImage" />
+                           </children></AnchorPane>
                   </content>
                 </TitledPane>
                 <TitledPane fx:id="titledPane3" animated="false" text="Database">
@@ -82,7 +85,7 @@
               <content>
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="200.0" prefWidth="584.0">
                      <children>
-                        <TableView fx:id="tableView" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                        <TableView fx:id="tableView" onMouseClicked="#dblClick" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                           <columns>
                             <TableColumn fx:id="id" prefWidth="75.0" text="id" />
                             <TableColumn fx:id="productName" prefWidth="75.0" text="Product name" />

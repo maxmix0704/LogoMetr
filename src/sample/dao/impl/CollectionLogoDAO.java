@@ -22,7 +22,7 @@ public class CollectionLogoDAO implements LogoDAO{
     }
 
     @Override
-    public Logo find(Logo logo) {
+    public Logo find(Integer id) {
         return null;
     }
 

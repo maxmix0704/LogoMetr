@@ -31,6 +31,7 @@ public class DialogWindowController implements Initializable {
     LogoDAO dao;
     FXMLLoader loader;
     Controller controller;
+    CaptureController captureController;
 
     @FXML
     public TextField productNameField;
@@ -62,18 +63,26 @@ public class DialogWindowController implements Initializable {
                     editLogo.setEventTypeLogo(EventTypeLogo.LOGO);
                 editLogo.setDate(new Date().toString());
                 editLogo.setProductName(productNameField.getText());
+                editLogo.setIdBase(Integer.parseInt(idBaseField.getText()));
                 editLogo.setSize(Controller.getSize());
+                editLogo.setImage(controller.imgViewMain.getImage());
                 dao.insert(editLogo);
+                break;
             case "Edit":
                 editLogo.setProductName(productNameField.getText());
                 editLogo.setIdBase(Integer.parseInt(idBaseField.getText()));
                 editLogo.setId(Controller.editLogo.getId());
                 dao.update(editLogo);
+                break;
         }
         this.stage.hide();
         idBaseField.setText("");
         productNameField.setText("");
         controller.updateTable();
+        controller.clearRect();
+        controller.isPressCheck=false;
+        controller.isCalcSize=false;
+
     }
 
     public void pressCancel(ActionEvent event) {
