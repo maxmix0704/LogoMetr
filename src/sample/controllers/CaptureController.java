@@ -69,19 +69,25 @@ public class CaptureController implements Initializable{
     }
 
     public void drawRect(GraphicsContext gc, Color color, float x, float y, float x2, float y2){
-        gc.strokeRect(x,y,x2,y2);
-        gc.setStroke(color);
-        gc.setLineWidth(1);
-        gc.setLineDashes(10);
-        gc.setLineDashOffset(3);
+        gc.clearRect(x,y,x2,y2);
+//        gc.setStroke(color);
+//        gc.setLineWidth(0.5);
+//        gc.setLineDashes(10);
+//        gc.setLineDashOffset(3);
     }
 
     public void clearRect(GraphicsContext gc){
         gc.clearRect(0,0,gc.getCanvas().getWidth(),gc.getCanvas().getHeight());
     }
 
+    public void fillCanvas(GraphicsContext gc) {
+        gc.setFill(Color.color(0.1,0.1,0.1,0.2));
+        gc.fillRect(0,0,gc.getCanvas().getWidth(),gc.getCanvas().getHeight());
+    }
+
     public void redrawRect(GraphicsContext gc, Color color, float x, float y, float x2, float y2){
         clearRect(gc);
+        fillCanvas(gc);
         drawRect(gc,color,x,y,x2,y2);
     }
 

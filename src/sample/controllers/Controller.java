@@ -25,6 +25,7 @@ import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
+import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.transform.Transform;
 import javafx.stage.*;
@@ -91,6 +92,7 @@ public class Controller implements Initializable{
     public TableColumn<Logo,String> date;
     public TableColumn<Logo,EventTypeLogo> eventTypeLogo;
     public Button show;
+    public Button btnSaveImg;
 
     @FXML
     Canvas canvasMain;
@@ -196,7 +198,10 @@ public class Controller implements Initializable{
         canvasMain.setHeight(height);
             if (isPressCheck && !isClicked) {
                 captureController.redrawRect(this.gc, COLOR_FRAME_OF_LOGO, startX, startY, endX - startX, endY - startY);
-                if (isCalcSize) showText(gc, "%.2f%%", logoSize, 35, COLOR_TEXT_PERCENT_OF_LOGO);
+                showText2(this.gc, "%.2f%%",getLogoSize(),10,COLOR_TEXT_PERCENT_OF_LOGO,(int) startX+25,(int)startY+5);
+//                if (isCalcSize) {
+//                    showText(gc, "%.2f%%", logoSize, 35, COLOR_TEXT_PERCENT_OF_LOGO);
+//                }
             }
     }
 
@@ -206,7 +211,8 @@ public class Controller implements Initializable{
             endX = (int) mouseEvent.getX();
             endY = (int) mouseEvent.getY();
             captureController.redrawRect(this.gc,COLOR_FRAME_OF_LOGO,startX, startY, endX-startX, endY-startY);
-            gc.strokeRect(startX,startY,endX-startX,endY-startY);
+            showText2(this.gc, "%.2f%%",getLogoSize(),10,COLOR_TEXT_PERCENT_OF_LOGO,(int) startX+25,(int)startY+5);
+//            gc.strokeRect(startX,startY,endX-startX,endY-startY);
         }
     }
 
@@ -217,6 +223,8 @@ public class Controller implements Initializable{
             captureController.clearRect(this.gc);
             startX= (int) mouseEvent.getX();
             startY= (int) mouseEvent.getY();
+//            gc.setFill(Color.color(0.1,0.1,0.1,0.2));
+//            gc.fillRect(0,0,gc.getCanvas().getWidth(),gc.getCanvas().getHeight());
         }
         else {
             isClicked=false;
@@ -275,6 +283,8 @@ public class Controller implements Initializable{
         this.gc=canvasMain.getGraphicsContext2D();
         btnCheck.setDisable(true);
         btnSave.setDisable(true);
+        btnSaveImg.setDisable(true);
+
         accord.setExpandedPane(titledPane1);
         this.logoDao = new CollectionLogoDAO();
     }
@@ -282,14 +292,15 @@ public class Controller implements Initializable{
 
     public void pressEnter(KeyEvent keyEvent) {
         if (keyEvent.getCode() == KeyCode.ENTER) {
-            System.out.println(getLogoSize());
-            System.out.println();
-            System.out.println("Frame="+canvasMain.getHeight()*canvasMain.getWidth());
-            System.out.println("Logo="+(endX-startX)*(endY-startY));
+//            System.out.println(getLogoSize());
+//            System.out.println();
+//            System.out.println("Frame="+canvasMain.getHeight()*canvasMain.getWidth());
+//            System.out.println("Logo="+(endX-startX)*(endY-startY));
             logoSize=getLogoSize();
             isCalcSize = true;
-            showText(this.gc,"%.2f%%",logoSize,35,COLOR_TEXT_PERCENT_OF_LOGO);
+//            showText(this.gc,"%.2f%%",logoSize,35,COLOR_TEXT_PERCENT_OF_LOGO);
             btnSave.setDisable(false);
+            btnSaveImg.setDisable(false);
         }
     }
 
@@ -304,6 +315,17 @@ public class Controller implements Initializable{
         gc.fillText(builder.toString(),
                 Math.round(gc.getCanvas().getWidth()  / 2),
                 Math.round(gc.getCanvas().getHeight() / 2));
+    }
+
+    public void showText2(GraphicsContext gc, String format, Object text, int size, Color color, int x, int y) {
+        gc.setTextAlign(TextAlignment.CENTER);
+        gc.setTextBaseline(VPos.CENTER);
+        gc.setFont(Font.font ("Verdana", size));
+        gc.setFill(color);
+        StringBuilder builder = new StringBuilder();
+        Formatter formatter = new Formatter(builder);
+        formatter.format(format,text);
+        gc.fillText(builder.toString(),x,y);
     }
 
     public void checkLogo(ActionEvent event) {
@@ -389,41 +411,74 @@ public class Controller implements Initializable{
 
     public Image getResultImage(){
         Image image = imgViewMain.getImage();
+        BufferedImage bImage = SwingFXUtils.fromFXImage(image, null);
 
         SnapshotParameters params = new SnapshotParameters();
         params.setFill(Color.TRANSPARENT);
         Image snapshot = canvasMain.snapshot(params, null);
 
-        BufferedImage bImage = SwingFXUtils.fromFXImage(snapshot, null);
+        BufferedImage bImage2 = SwingFXUtils.fromFXImage(snapshot, null);
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         InputStream inputStream;
         try {
-            ImageIO.write(bImage, "png", outputStream);
+            ImageIO.write(bImage2, "png", outputStream);
             byte[] res  = outputStream.toByteArray();
             inputStream = new ByteArrayInputStream(res);
             snapshot = new Image(inputStream,image.getWidth(),image.getHeight(),false,false);
         } catch (IOException e) {
             e.printStackTrace();
         }
+        bImage2 = SwingFXUtils.fromFXImage(snapshot, null);
+//        PixelReader pixelReaderCanvas =  snapshot.getPixelReader();
+//        PixelReader pixelReaderImgView = image.getPixelReader();
+//
+//        WritableImage writableImage =
+//                new WritableImage(pixelReaderImgView,(int)imgViewMain.getImage().getWidth(),(int)imgViewMain.getImage().getHeight());
+//        PixelWriter pixelWriter = writableImage.getPixelWriter();
 
-        PixelReader pixelReaderCanvas =  snapshot.getPixelReader();
-        PixelReader pixelReaderImgView = image.getPixelReader();
+        float alpha = 0.75f;
+        int compositeRule = AlphaComposite.SRC_OVER;
+        AlphaComposite ac;
+        int imgW = (int) image.getWidth();
+        int imgH = (int) image.getHeight();
+        BufferedImage overlay = new BufferedImage(imgW, imgH, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g = overlay.createGraphics();
+        ac = AlphaComposite.getInstance(compositeRule, alpha);
+        g.drawImage(bImage,0,0,null);
+        g.setComposite(ac);
+        g.drawImage(bImage2,0,0,null);
+        g.setComposite(ac);
+        Image imageRes = SwingFXUtils.toFXImage(overlay, null);
+        g.dispose();
 
-        WritableImage writableImage =
-                new WritableImage(pixelReaderImgView,(int)imgViewMain.getImage().getWidth(),(int)imgViewMain.getImage().getHeight());
-        PixelWriter pixelWriter = writableImage.getPixelWriter();
-        for(int y=0; y<image.getHeight(); y++){
-            for(int x=0; x<image.getWidth(); x++){
-                Color color = pixelReaderCanvas.getColor(x, y);
-                if (!color.equals(Color.TRANSPARENT))
-                pixelWriter.setColor(x, y, color);
-            }
-        }
-        return writableImage;
+//        for(int y=0; y<image.getHeight(); y++){
+////            for(int x=0; x<image.getWidth(); x++){
+////                Color color = pixelReaderCanvas.getColor(x, y);
+////                 if (!color.equals(Color.TRANSPARENT))
+////                pixelWriter.setColor(x, y, color);
+////            }
+////        }
+        return imageRes;
     }
 
     public void clearRect(){
         captureController.clearRect(this.gc);
     }
 
+    public void saveLogoImg(ActionEvent event) {
+        FileChooser fileChooser = new FileChooser();
+        FileChooser.ExtensionFilter extFilterPNG = new FileChooser.ExtensionFilter("PNG files (*.png)", "*.PNG");
+        FileChooser.ExtensionFilter extFilterJPG = new FileChooser.ExtensionFilter("JPG files (*.jpg)", "*.JPG");
+        fileChooser.getExtensionFilters().addAll(extFilterJPG, extFilterPNG);
+        fileChooser.setTitle("Save Image");
+        File file = fileChooser.showSaveDialog(null);
+        if (file != null) {
+            try {
+                ImageIO.write(SwingFXUtils.fromFXImage(getResultImage(),
+                        null), "png", file);
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        }
+    }
 }

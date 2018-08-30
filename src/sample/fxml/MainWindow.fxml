@@ -48,7 +48,8 @@
                                  <children>
                                     <Button fx:id="btnCreate" mnemonicParsing="false" onAction="#pressBtnCreateFrame" prefHeight="25.0" prefWidth="85.0" text="Create frame" />
                                     <Button fx:id="btnCheck" mnemonicParsing="false" onAction="#checkLogo" prefHeight="25.0" prefWidth="85.0" text="Check logo" />
-                                    <Button fx:id="btnSave" mnemonicParsing="false" onAction="#saveLogo" prefHeight="25.0" prefWidth="85.0" text="Save" />
+                                    <Button fx:id="btnSave" mnemonicParsing="false" onAction="#saveLogo" prefHeight="25.0" prefWidth="85.0" text="Save to db" />
+                                    <Button fx:id="btnSaveImg" mnemonicParsing="false" onAction="#saveLogoImg" prefHeight="25.0" prefWidth="85.0" text="Save image" />
                                  </children>
                               </VBox>
                            </children>
