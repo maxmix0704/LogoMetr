@@ -42,11 +42,11 @@
                            <children>
                               <VBox alignment="CENTER" layoutX="50.0" layoutY="3.0" prefHeight="157.0" prefWidth="100.0" spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                  <children>
-                                    <Button fx:id="btnCreate" mnemonicParsing="false" onAction="#pressBtnCreateFrame" prefHeight="25.0" prefWidth="85.0" text="Create frame" />
-                                    <Button fx:id="btnCheck" mnemonicParsing="false" onAction="#checkLogo" prefHeight="25.0" prefWidth="85.0" text="Check logo" />
+                                    <Button fx:id="btnCreate" mnemonicParsing="false" onAction="#btnCreateFrame" prefHeight="25.0" prefWidth="85.0" text="Create frame" />
+                                    <Button fx:id="btnCheck" mnemonicParsing="false" onAction="#btnCheckLogo" prefHeight="25.0" prefWidth="85.0" text="Check logo" />
                                     <Label fx:id="lblResult" text="--%" />
-                                    <Button fx:id="btnSave" mnemonicParsing="false" onAction="#saveLogo" prefHeight="25.0" prefWidth="85.0" text="Save to db" />
-                                    <Button fx:id="btnSaveImg" mnemonicParsing="false" onAction="#saveLogoImg" prefHeight="25.0" prefWidth="85.0" text="Save image" />
+                                    <Button fx:id="btnSave" mnemonicParsing="false" onAction="#btnSaveLogo" prefHeight="25.0" prefWidth="85.0" text="Save to db" />
+                                    <Button fx:id="btnSaveImg" mnemonicParsing="false" onAction="#btnSaveLogoImg" prefHeight="25.0" prefWidth="85.0" text="Save image" />
                                  </children>
                               </VBox>
                            </children>
@@ -67,8 +67,8 @@
                            <children>
                               <VBox alignment="CENTER" layoutX="34.0" layoutY="-19.0" prefHeight="200.0" prefWidth="100.0" spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                  <children>
-                                    <Button fx:id="btnEdit" mnemonicParsing="false" onAction="#editLogo" prefHeight="25.0" prefWidth="85.0" text="Edit" />
-                                    <Button fx:id="btnDelete" mnemonicParsing="false" onAction="#deleteLogo" prefHeight="25.0" prefWidth="85.0" text="Delete" />
+                                    <Button fx:id="btnEdit" mnemonicParsing="false" onAction="#btnEditLogo" prefHeight="25.0" prefWidth="85.0" text="Edit" />
+                                    <Button fx:id="btnDelete" mnemonicParsing="false" onAction="#btnDeleteLogo" prefHeight="25.0" prefWidth="85.0" text="Delete" />
                                  </children>
                               </VBox>
                            </children></AnchorPane>

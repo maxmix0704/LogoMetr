@@ -42,8 +42,6 @@ public class CaptureController implements Initializable{
 
     private boolean isClicked = false;
 
-    Color color = Color.RED;
-
     public void setScreenCapture(){
         imgView.setFitHeight(getHeightScreen());
         imgView.setFitWidth(getWidthScreen());
@@ -68,15 +66,7 @@ public class CaptureController implements Initializable{
         return null;
     }
 
-    public void drawRect(GraphicsContext gc, Color color, float x, float y, float x2, float y2){
-        gc.clearRect(x,y,x2,y2);
-//        gc.setStroke(color);
-//        gc.setLineWidth(0.5);
-//        gc.setLineDashes(10);
-//        gc.setLineDashOffset(3);
-    }
-
-    public void clearRect(GraphicsContext gc){
+    public void clearCanvas(GraphicsContext gc){
         gc.clearRect(0,0,gc.getCanvas().getWidth(),gc.getCanvas().getHeight());
     }
 
@@ -85,10 +75,10 @@ public class CaptureController implements Initializable{
         gc.fillRect(0,0,gc.getCanvas().getWidth(),gc.getCanvas().getHeight());
     }
 
-    public void redrawRect(GraphicsContext gc, Color color, float x, float y, float x2, float y2){
-        clearRect(gc);
+    public void redrawRect(GraphicsContext gc, Rectangle rectangle){
+        clearCanvas(gc);
         fillCanvas(gc);
-        drawRect(gc,color,x,y,x2,y2);
+        gc.clearRect(rectangle.x,rectangle.y,rectangle.width,rectangle.height);
     }
 
     public int getHeightScreen(){
@@ -101,22 +91,54 @@ public class CaptureController implements Initializable{
 
     public void moveMouse(MouseEvent mouseEvent) {
         if  (isClicked) {
-            endX = MouseInfo.getPointerInfo().getLocation().x;
-            endY = MouseInfo.getPointerInfo().getLocation().y;
-            redrawRect(this.gc,color, startX, startY, endX-startX, endY-startY);
+            this.endX = MouseInfo.getPointerInfo().getLocation().x;
+            this.endY = MouseInfo.getPointerInfo().getLocation().y;
+            redrawRect(this.gc,getRectAWT(startX,startY,endX,endY));
         }
     }
 
     public void pressMouseButton(MouseEvent mouseEvent) {
         if (!isClicked) {
             isClicked = true;
-            clearRect(this.gc);
+            clearCanvas(this.gc);
             startX=MouseInfo.getPointerInfo().getLocation().x;
             startY=MouseInfo.getPointerInfo().getLocation().y;
         }
         else {
             isClicked=false;
         }
+    }
+
+    public Rectangle getRectAWT(float x, float y, float x2, float y2){
+        float startX;
+        float startY;
+        float width;
+        float height;
+        if ((x2<x)&&(y2<y)){
+            startX=x2;
+            startY=y2;
+            width=x-x2;
+            height=y-y2;
+        } else
+            if ((x2>x)&&(y2<y)){
+                startX=x;
+                startY=y-(y-y2);
+                width=x2-x;
+                height=y-y2;
+            } else
+                if ((x2<x)&&(y2>y)){
+                    startX=x2;
+                    startY=y2-(y2-y);
+                    width=x-x2;
+                    height=y2-y;
+                    } else
+                        {
+                        startX=x;
+                        startY=y;
+                        width=x2-x;
+                        height=y2-y;
+                        }
+        return new Rectangle((int) startX,(int) startY,(int) width,(int) height);
     }
 
     @Override

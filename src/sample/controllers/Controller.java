@@ -1,6 +1,5 @@
 package sample.controllers;
 
-import com.sun.prism.impl.PrismSettings;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -27,9 +26,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
-import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
-import javafx.scene.transform.Transform;
 import javafx.stage.*;
 import sample.dao.DAOFactory;
 import sample.dao.interfaces.LogoDAO;
@@ -46,7 +43,6 @@ import java.io.*;
 import java.math.BigDecimal;
 import java.net.URL;
 import java.sql.Connection;
-import java.sql.SQLOutput;
 import java.util.Formatter;
 import java.util.ResourceBundle;
 
@@ -118,6 +114,7 @@ public class Controller implements Initializable{
     Boolean isCalcSize = false;
     Boolean isFrameCreate = false;
     Boolean isRectCreate = false;
+    Boolean isZoomed =false;
 
     public static GraphicsContext gc;
 
@@ -126,9 +123,12 @@ public class Controller implements Initializable{
     float endX;
     float endY;
 
-    int fontSize;
+    public static float logoSize;
 
-    private static float logoSize = 0;
+    Image defImage;
+    Image resImage;
+    Rectangle rectangle;
+
 
     DAOFactory daoFactory;
     Connection connection;
@@ -142,10 +142,10 @@ public class Controller implements Initializable{
     private static Color COLOR_FRAME_OF_LOGO = Color.rgb(255,117,4,0.8);
 
     @FXML
-    public void pressBtnCreateFrame(ActionEvent event) {
+    public void btnCreateFrame(ActionEvent event) {
         primaryStage.hide();
-        captureController.clearRect(captureController.gc);
-        captureController.clearRect(this.gc);
+        captureController.clearCanvas(captureController.gc);
+        captureController.clearCanvas(this.gc);
         try {
             Thread.sleep(500);
         } catch (InterruptedException e) {
@@ -153,12 +153,23 @@ public class Controller implements Initializable{
         }
         captureStage.show();
         captureController.setScreenCapture();
-        showText(captureController.gc,"%s","Hightline the frame",100, COLOR_TEXT_SELECT_FRAME);
+        showText(captureController.gc,
+                "%s",
+                "Hightline the frame",
+                100,
+                COLOR_TEXT_SELECT_FRAME,
+                (int)Math.round(captureController.gc.getCanvas().getWidth()/ 2),
+                (int)Math.round(captureController.gc.getCanvas().getHeight()  / 2));
         captureController.setScreenCapture();
         captureStage.getScene().setOnKeyPressed(new EventHandler<KeyEvent>() {
             public void handle(KeyEvent keyEvent) {
                 if (keyEvent.getCode() == KeyCode.ENTER) {
-                    imgViewMain.setImage(captureController.grabScreenRegion((int) captureController.startX,(int) captureController.startY,(int) captureController.endX,(int) captureController.endY));
+                    defImage = captureController.grabScreenRegion(captureController.getRectAWT(
+                            (int) captureController.startX,
+                            (int) captureController.startY,
+                            (int) captureController.endX,
+                            (int) captureController.endY));
+                    imgViewMain.setImage(defImage);
                     imgViewMain.setFitWidth(imgViewMain.getImage().getWidth());
                     imgViewMain.setFitHeight(imgViewMain.getImage().getHeight());
                     canvasMain.setHeight(imgViewMain.getImage().getHeight());
@@ -177,43 +188,38 @@ public class Controller implements Initializable{
         });
         isPressCheck=false;
         isCalcSize=false;
+        primaryStage.setMaximized(true);
         lblResult.setText("--%");
     }
 
     public void scrollMouse(ScrollEvent scrollEvent) {
-        float width = (float)imgViewMain.getFitWidth();
-        float height = (float)imgViewMain.getFitHeight();
-        float kZoom;
-        if (scrollEvent.getDeltaY()>0){
-            kZoom=0.9f;
-            fontSize-=1;
-        }
-        else
-        {
-            kZoom=1.1f;
-            fontSize+=1;
-        }
-        startX*=kZoom;
-        startY*=kZoom;
-        endX*=kZoom;
-        endY*=kZoom;
-        width*=kZoom;
-        height*=kZoom;
-
-        imgViewMain.setFitWidth(width);
-        imgViewMain.setFitHeight(height);
-        canvasMain.setWidth(width);
-        canvasMain.setHeight(height);
-
-            if (isPressCheck && !isClicked) {
-                captureController.redrawRect(this.gc, COLOR_FRAME_OF_LOGO, startX, startY, endX - startX, endY - startY);
-                showText2(this.gc, "%.2f%%",getLogoSize(),fontSize,COLOR_TEXT_PERCENT_OF_LOGO,(int) startX+35+Math.round(fontSize/4),(int) startY+10+Math.round(fontSize/4));
-
-                //                if (isCalcSize) {
-//                    showText(gc, "%.2f%%", logoSize, 35, COLOR_TEXT_PERCENT_OF_LOGO);
-//                }
+        if (!isClicked) {
+            float width = (float) imgViewMain.getFitWidth();
+            float height = (float) imgViewMain.getFitHeight();
+            float kZoom;
+            if (!isZoomed) {
+                resImage = getResultImage();
+                imgViewMain.setImage(resImage);
+                captureController.clearCanvas(this.gc);
+                isZoomed = true;
             }
-        System.out.println("FS="+fontSize);
+            if (scrollEvent.getDeltaY() > 0) {
+                kZoom = 0.9f;
+            } else {
+                kZoom = 1.1f;
+            }
+            startX *= kZoom;
+            startY *= kZoom;
+            endX *= kZoom;
+            endY *= kZoom;
+            width *= kZoom;
+            height *= kZoom;
+
+            imgViewMain.setFitWidth(width);
+            imgViewMain.setFitHeight(height);
+            canvasMain.setWidth(width);
+            canvasMain.setHeight(height);
+        }
     }
 
     public void movedMouseMain(MouseEvent mouseEvent) {
@@ -221,9 +227,11 @@ public class Controller implements Initializable{
             isRectCreate =true;
             endX = (int) mouseEvent.getX();
             endY = (int) mouseEvent.getY();
-            captureController.redrawRect(this.gc,COLOR_FRAME_OF_LOGO,startX, startY, endX-startX, endY-startY);
-            showText2(this.gc, "%.2f%%",getLogoSize(),20,COLOR_TEXT_PERCENT_OF_LOGO,(int) startX+50,(int)startY+15);
-            lblResult.setText(Float.toString(round(getLogoSize(),2))+"%");
+            rectangle=captureController.getRectAWT(startX,startY,endX,endY);
+            logoSize=calcLogoSize();
+            captureController.redrawRect(this.gc,rectangle);
+            showText(this.gc, "%.2f%%", calcLogoSize(),20,COLOR_TEXT_PERCENT_OF_LOGO,(int) startX+50,(int)startY+15);
+            lblResult.setText(Float.toString(round(calcLogoSize(),2))+"%");
             lblResult.setFont(Font.font("Verdana",FontWeight.BOLD,15));
         }
     }
@@ -232,20 +240,19 @@ public class Controller implements Initializable{
         if (!isClicked&&isPressCheck) {
             isClicked = true;
             isCalcSize = false;
-            captureController.clearRect(this.gc);
-            startX= (int) mouseEvent.getX();
-            startY= (int) mouseEvent.getY();
-            fontSize=10;
-//            gc.setFill(Color.color(0.1,0.1,0.1,0.2));
-//            gc.fillRect(0,0,gc.getCanvas().getWidth(),gc.getCanvas().getHeight());
+            isZoomed=false;
+            captureController.clearCanvas(this.gc);
+            imgViewMain.setImage(defImage);
+            this.startX= (int) mouseEvent.getX();
+            this.startY= (int) mouseEvent.getY();
+            btnSave.setDisable(true);
+            btnSaveImg.setDisable(true);
         }
         else {
             isClicked=false;
             canvasMain.requestFocus();
             System.out.println(startX+" "+startY+"-"+endX+" "+endY);
         }
-        btnSave.setDisable(true);
-        btnSaveImg.setDisable(true);
     }
 
     @Override
@@ -300,6 +307,7 @@ public class Controller implements Initializable{
         btnCheck.setDisable(true);
         btnSave.setDisable(true);
         btnSaveImg.setDisable(true);
+
         lblResult.setFont(Font.font("Verdana",FontWeight.BOLD,15));
         lblResult.setText("--%");
 
@@ -310,32 +318,13 @@ public class Controller implements Initializable{
 
     public void pressEnter(KeyEvent keyEvent) {
         if (keyEvent.getCode() == KeyCode.ENTER) {
-//            System.out.println(getLogoSize());
-//            System.out.println();
-//            System.out.println("Frame="+canvasMain.getHeight()*canvasMain.getWidth());
-//            System.out.println("Logo="+(endX-startX)*(endY-startY));
-            logoSize=getLogoSize();
             isCalcSize = true;
-//            showText(this.gc,"%.2f%%",logoSize,35,COLOR_TEXT_PERCENT_OF_LOGO);
             btnSave.setDisable(false);
             btnSaveImg.setDisable(false);
         }
     }
 
-    public void showText(GraphicsContext gc, String format, Object text, int size, Color color) {
-        gc.setTextAlign(TextAlignment.CENTER);
-        gc.setTextBaseline(VPos.CENTER);
-        gc.setFont(Font.font ("Verdana", size));
-        gc.setFill(color);
-        StringBuilder builder = new StringBuilder();
-        Formatter formatter = new Formatter(builder);
-        formatter.format(format,text);
-        gc.fillText(builder.toString(),
-                Math.round(gc.getCanvas().getWidth()  / 2),
-                Math.round(gc.getCanvas().getHeight() / 2));
-    }
-
-    public void showText2(GraphicsContext gc, String format, Object text, int size, Color color, int x, int y) {
+    public void showText(GraphicsContext gc, String format, Object text, int size, Color color, int x, int y) {
         gc.setTextAlign(TextAlignment.CENTER);
         gc.setTextBaseline(VPos.CENTER);
         gc.setFont(Font.font ("Verdana",FontWeight.BOLD, size));
@@ -346,25 +335,25 @@ public class Controller implements Initializable{
         gc.fillText(builder.toString(),x,y);
     }
 
-    public void checkLogo(ActionEvent event) {
+    public void btnCheckLogo(ActionEvent event) {
         isPressCheck =true;
         btnCheck.setDisable(true);
         canvasMain.setFocusTraversable(true);
-        showText(this.gc,"%s","Hightline the logo", 25,COLOR_TEXT_SELECT_LOGO);
+        showText(this.gc,"%s","Hightline the logo", 25,COLOR_TEXT_SELECT_LOGO,(int) canvasMain.getWidth()/2,(int)canvasMain.getHeight()/2);
     }
 
-    public float getLogoSize(){
+    public float calcLogoSize(){
         float result;
         float sizeFrame = (float) (canvasMain.getHeight()*canvasMain.getWidth());
-        float sizeLogo = (endX-startX)*(endY-startY);
+        float sizeLogo = rectangle.height*rectangle.width;
         result=(sizeLogo*100)/sizeFrame;
         if (result>0)
-            return result;
+            return round(result,2);
         return 0;
     }
 
-    public static float getSize(){
-        return round(logoSize,2);
+    public static float getLogoSize(){
+        return logoSize;
     }
 
     public static float round(float d, int decimalPlace) {
@@ -373,23 +362,9 @@ public class Controller implements Initializable{
         return bd.floatValue();
     }
 
-//    public void saveLogo(ActionEvent event) {
-//        EventTypeLogo eventTypeLogo = EventTypeLogo.LOGO;
-//        if (logoSize>12) eventTypeLogo = EventTypeLogo.PANE;
-//        Logo logo = new Logo();
-//        logo.setId(1);
-//        logo.setProductName("Rozetka");
-//        logo.setIdBase(1444);
-//        logo.setSize(logoSize);
-//        logo.setEventTypeLogo(eventTypeLogo);
-//        logo.setImage(imgViewMain.getImage());
-//        logo.setDate(new Date().toString());
-//        logoDao.insert(logo);
-//        updateTable();
-//    }
-
-    public void saveLogo(ActionEvent event){
+    public void btnSaveLogo(ActionEvent event){
         dialogStage.setTitle("Save");
+        dialogWindowController.productNameField.requestFocus();
         dialogWindowController.btnDialogWindow.setText("Save");
         dialogStage.showAndWait();
     }
@@ -402,7 +377,7 @@ public class Controller implements Initializable{
         return dialogStage;
     }
 
-    public void editLogo(ActionEvent event) {
+    public void btnEditLogo(ActionEvent event) {
         dialogStage.setTitle("Edit");
         dialogWindowController.btnDialogWindow.setText("Edit");
         Logo logo = (Logo) tableView.getSelectionModel().getSelectedItem();
@@ -412,23 +387,22 @@ public class Controller implements Initializable{
         dialogStage.showAndWait();
     }
 
-    public void deleteLogo(ActionEvent event) {
+    public void btnDeleteLogo(ActionEvent event) {
         dao.delete((Logo) tableView.getSelectionModel().getSelectedItem());
         updateTable();
-    }
-
-    public void showImage(ActionEvent event){
-        getResultImage();
     }
 
     public void dblClick(MouseEvent mouseEvent) {
         if (mouseEvent.getClickCount() == 2){
             isPressCheck=false;
-            captureController.clearRect(gc);
+            captureController.clearCanvas(this.gc);
             lblResult.setText("--%");
             Logo logo = (Logo) tableView.getSelectionModel().getSelectedItem();
-            imgViewMain.setImage(dao.find(logo.getId()).getImage());
+            resImage=dao.find(logo.getId()).getImage();
+            imgViewMain.setImage(resImage);
             System.out.println(logo.getId());
+            btnSave.setDisable(true);
+            btnSaveImg.setDisable(false);
         }
     }
 
@@ -452,13 +426,6 @@ public class Controller implements Initializable{
             e.printStackTrace();
         }
         bImage2 = SwingFXUtils.fromFXImage(snapshot, null);
-//        PixelReader pixelReaderCanvas =  snapshot.getPixelReader();
-//        PixelReader pixelReaderImgView = image.getPixelReader();
-//
-//        WritableImage writableImage =
-//                new WritableImage(pixelReaderImgView,(int)imgViewMain.getImage().getWidth(),(int)imgViewMain.getImage().getHeight());
-//        PixelWriter pixelWriter = writableImage.getPixelWriter();
-
         float alpha = 1f;
         int compositeRule = AlphaComposite.SRC_OVER;
         AlphaComposite ac;
@@ -473,22 +440,10 @@ public class Controller implements Initializable{
         g.setComposite(ac);
         Image imageRes = SwingFXUtils.toFXImage(overlay, null);
         g.dispose();
-
-//        for(int y=0; y<image.getHeight(); y++){
-////            for(int x=0; x<image.getWidth(); x++){
-////                Color color = pixelReaderCanvas.getColor(x, y);
-////                 if (!color.equals(Color.TRANSPARENT))
-////                pixelWriter.setColor(x, y, color);
-////            }
-////        }
         return imageRes;
     }
 
-    public void clearRect(){
-        captureController.clearRect(this.gc);
-    }
-
-    public void saveLogoImg(ActionEvent event) {
+    public void btnSaveLogoImg(ActionEvent event) {
         FileChooser fileChooser = new FileChooser();
         FileChooser.ExtensionFilter extFilterPNG = new FileChooser.ExtensionFilter("PNG files (*.png)", "*.PNG");
         FileChooser.ExtensionFilter extFilterJPG = new FileChooser.ExtensionFilter("JPG files (*.jpg)", "*.JPG");
@@ -497,11 +452,19 @@ public class Controller implements Initializable{
         File file = fileChooser.showSaveDialog(null);
         if (file != null) {
             try {
-                ImageIO.write(SwingFXUtils.fromFXImage(getResultImage(),
+                ImageIO.write(SwingFXUtils.fromFXImage(resImage,
                         null), "png", file);
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
         }
+    }
+
+    public void clearRect(){
+        captureController.clearCanvas(this.gc);
+    }
+
+    public void showImage(ActionEvent event){
+        getResultImage();
     }
 }
