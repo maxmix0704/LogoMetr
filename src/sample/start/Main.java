@@ -4,6 +4,7 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import sample.controllers.Controller;
 import sample.dao.DAOFactory;
@@ -31,6 +32,7 @@ public class Main extends Application {
             e.printStackTrace();
         }
         primaryStage.setTitle("LogoMetr");
+        primaryStage.getIcons().add(new Image("images/icon.png"));
         primaryStage.setScene(new Scene(root, 600, 400));
         primaryStage.setMinHeight(420);
         primaryStage.setMinWidth(640);

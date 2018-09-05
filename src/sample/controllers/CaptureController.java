@@ -81,7 +81,7 @@ public class CaptureController implements Initializable{
     }
 
     public void fillCanvas(GraphicsContext gc) {
-        gc.setFill(Color.color(0.1,0.1,0.1,0.2));
+        gc.setFill(Color.color(0.1,0.1,0.1,0.4));
         gc.fillRect(0,0,gc.getCanvas().getWidth(),gc.getCanvas().getHeight());
     }
 

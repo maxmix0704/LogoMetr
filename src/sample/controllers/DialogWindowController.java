@@ -8,6 +8,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import sample.dao.DAOFactory;
 import sample.dao.interfaces.LogoDAO;
@@ -50,6 +51,7 @@ public class DialogWindowController implements Initializable {
         this.dao = daoFactory.getLogoDAO();
         this.stage=Controller.getDialogStage();
         this.loader=Main.getLoader();
+        stage.getIcons().add(new Image("images/icon.png"));
         controller=loader.getController();
     }
 
