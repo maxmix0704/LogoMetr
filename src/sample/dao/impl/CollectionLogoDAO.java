@@ -23,17 +23,22 @@ public class CollectionLogoDAO implements LogoDAO{
 
     @Override
     public boolean insert(Logo logo) {
+        if (logo.getId()==0)
         logo.setId(logoList.size()+1);
-        logoList.add(logo);
-        Utils.saveDb(logoList);
-        return true;
+        if (logoList.add(logo)) {
+            Utils.saveDb(logoList);
+            return true;
+        } else
+        return false;
     }
 
     @Override
     public boolean delete(Logo logo) {
-        logoList.remove(logo);
-        Utils.saveDb(logoList);
-        return true;
+        if (logoList.remove(logo)){
+            Utils.saveDb(logoList);
+            return true;
+        }
+        return false;
     }
 
     @Override
@@ -43,20 +48,12 @@ public class CollectionLogoDAO implements LogoDAO{
 
     @Override
     public boolean update(Logo logo) {
-        Logo buf = new Logo();
-
-        buf.setId(logo.getId());
-        buf.setProductName(logo.getProductName());
-        buf.setIdBase(logo.getIdBase());
-        buf.setSize(logo.getSize());
-        buf.setEventTypeLogo(logo.getEventTypeLogo());
-        buf.setDate(logo.getDate());
-        buf.setImage(logo.getImage());
-
+        Logo buf = new Logo(logo);
         logoList.remove(logoList.indexOf(logo));
-        logoList.add(buf);
-
-        Utils.saveDb(logoList);
+        if (logoList.add(buf)) {
+            Utils.saveDb(logoList);
+            return  true;
+        } else
         return false;
     }
 

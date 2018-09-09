@@ -50,10 +50,6 @@ public class DialogWindowController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-//        this.daoFactory = DAOFactory.getDAOFactory(DAOFactory.COLLECTION);
-////        this.connection = daoFactory.createConnection();
-//        this.dao = daoFactory.getLogoDAO();
-
         this.stage=Controller.getDialogStage();
         this.loader=Main.getLoader();
         stage.getIcons().add(new Image("images/icon.png"));
@@ -82,7 +78,6 @@ public class DialogWindowController implements Initializable {
                     else
                         editLogo.setEventTypeLogo(EventTypeLogo.LOGO);
                         date=new Date();
-
                     output = outputformat.format(date);
                     editLogo.setDate(output);
                     editLogo.setProductName(productNameField.getText());

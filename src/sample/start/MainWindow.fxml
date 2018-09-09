@@ -21,12 +21,12 @@
          <children>
             <StackPane fx:id="stackPane" layoutX="81.0" layoutY="23.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="200.0" AnchorPane.topAnchor="0.0">
                <children>
-                  <ImageView fx:id="imgViewMain" fitHeight="200.0" fitWidth="200.0" nodeOrientation="INHERIT" pickOnBounds="true" preserveRatio="true">
+                  <ImageView fx:id="imgViewMain" fitHeight="300.0" fitWidth="300.0" nodeOrientation="INHERIT" pickOnBounds="true" preserveRatio="true">
                      <viewport>
                         <Rectangle2D />
                      </viewport>
                   </ImageView>
-                  <Canvas fx:id="canvasMain" height="200.0" nodeOrientation="INHERIT" onKeyPressed="#pressEnter" onMouseMoved="#movedMouseMain" onMousePressed="#pressMouseMain" onScroll="#scrollMouse" width="200.0" />
+                  <Canvas fx:id="canvasMain" height="300.0" nodeOrientation="INHERIT" onKeyPressed="#pressEnter" onMouseMoved="#movedMouseMain" onMousePressed="#pressMouseMain" onScroll="#scrollMouse" width="300.0" />
                </children>
             </StackPane>
             <Accordion fx:id="accord" layoutX="364.0" layoutY="61.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">

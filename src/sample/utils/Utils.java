@@ -18,24 +18,26 @@ public class Utils {
             ObjectOutputStream oos = new ObjectOutputStream(fos);
             oos.writeObject(new ArrayList<Logo>(list));
             oos.close();
-        } catch (NotSerializableException exception) {
-            exception.printStackTrace();
         } catch (IOException exception) {
            exception.printStackTrace();
         }
     }
 
     public static ObservableList<Logo> loadDb() {
-        FileOutputStream fos = null;
-        ObjectOutputStream oos = null;
         List<Logo> logo = null;
         try {
             FileInputStream fis = new FileInputStream("collectionDB.tmp");
             ObjectInputStream ois = new ObjectInputStream(fis);
             logo = (List<Logo>) ois.readObject();
             ois.close();
-        } catch (Exception e) {
+        }catch (FileNotFoundException ex){
+            ObservableList<Logo> logolist = FXCollections.observableArrayList();
+            saveDb(logolist);
+            return logolist;
+        }catch (IOException e) {
             e.printStackTrace();
+        } catch (ClassNotFoundException ex2){
+            ex2.printStackTrace();
         }
         return FXCollections.observableList(logo);
     }

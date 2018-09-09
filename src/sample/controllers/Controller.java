@@ -47,6 +47,7 @@ import java.math.BigDecimal;
 import java.net.URL;
 import java.sql.Connection;
 import java.util.Formatter;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 
@@ -124,7 +125,6 @@ public class Controller implements Initializable{
     private static Color COLOR_TEXT_PERCENT_OF_LOGO = Color.rgb(141,19,144, 1);
     private static Color COLOR_TEXT_SELECT_FRAME = Color.rgb(49,38,255,0.9);
     private static Color COLOR_TEXT_SELECT_LOGO = Color.rgb(49,38,255,0.9);
-    private static Color COLOR_FRAME_OF_LOGO = Color.rgb(255,117,4,0.8);
 
     @FXML
     public void btnCreateFrame(ActionEvent event) {
@@ -242,8 +242,6 @@ public class Controller implements Initializable{
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-
-
         id.setCellValueFactory(new PropertyValueFactory<Logo, Integer>("id"));
         productName.setCellValueFactory(new PropertyValueFactory<Logo, String>("productName"));
         idBase.setCellValueFactory(new PropertyValueFactory<Logo, Integer>("idBase"));
@@ -367,6 +365,7 @@ public class Controller implements Initializable{
 
     public void updateTable() {
         tableView.setItems(dao.getAll());
+        tableView.getSortOrder().add(id);
     }
 
     public static Stage getDialogStage(){
@@ -387,8 +386,17 @@ public class Controller implements Initializable{
 
     public void btnDeleteLogo(ActionEvent event) {
         if (!tableView.getSelectionModel().getSelectedCells().isEmpty()) {
-            dao.delete((Logo) tableView.getSelectionModel().getSelectedItem());
-            updateTable();
+
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitle("Delete File");
+            alert.setHeaderText("Are you sure want to delete this record?");
+            Optional<ButtonType> option = alert.showAndWait();
+
+            if (option.get() == ButtonType.OK) {
+                dao.delete((Logo) tableView.getSelectionModel().getSelectedItem());
+                updateTable();
+            }
+
         }
     }
 
@@ -469,9 +477,9 @@ public class Controller implements Initializable{
         return dao;
     }
 
-    public void clearRect(){
-        captureController.clearCanvas(this.gc);
-    }
+//    public void clearRect(){
+//        captureController.clearCanvas(this.gc);
+//    }
 
     public void btnConn(ActionEvent event) {
         ObservableList<Logo> logoList = FXCollections.observableArrayList();

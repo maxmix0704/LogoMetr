@@ -10,7 +10,7 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 import java.nio.ByteBuffer;
 
-public class Logo implements Serializable {
+public class Logo implements Serializable, Comparable<Logo> {
     private SimpleIntegerProperty id = new SimpleIntegerProperty(0);
     private SimpleStringProperty productName = new SimpleStringProperty("");
     private SimpleIntegerProperty idBase = new SimpleIntegerProperty(0);
@@ -38,6 +38,7 @@ public class Logo implements Serializable {
         this.size = logo.sizeProperty();
         this.eventTypeLogo = logo.getEventTypeLogo();
         this.date = logo.dateProperty();
+        this.image = logo.getImage();
     }
 
     public int getId() {
@@ -159,5 +160,12 @@ public class Logo implements Serializable {
         eventTypeLogo = (EventTypeLogo) s.readObject();
         date = new SimpleStringProperty(s.readUTF());
         image = SwingFXUtils.toFXImage(ImageIO.read(s),null);
+    }
+
+    @Override
+    public int compareTo(Logo o) {
+        if (o.getId()>this.id.get()) return -1;
+        if (o.getId()<this.id.get()) return 1;
+        else return 0;
     }
 }
