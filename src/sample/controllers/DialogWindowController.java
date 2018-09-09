@@ -17,6 +17,10 @@ import sample.utils.EventTypeLogo;
 
 import java.net.URL;
 import java.sql.Connection;
+import java.sql.Timestamp;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.ResourceBundle;
 
@@ -42,11 +46,14 @@ public class DialogWindowController implements Initializable {
     public void show(){
         stage.show();
     }
+
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        this.daoFactory = DAOFactory.getDAOFactory(DAOFactory.POSTGRESQL);
-        this.connection = daoFactory.createConnection();
-        this.dao = daoFactory.getLogoDAO();
+//        this.daoFactory = DAOFactory.getDAOFactory(DAOFactory.COLLECTION);
+////        this.connection = daoFactory.createConnection();
+//        this.dao = daoFactory.getLogoDAO();
+
         this.stage=Controller.getDialogStage();
         this.loader=Main.getLoader();
         stage.getIcons().add(new Image("images/icon.png"));
@@ -54,15 +61,30 @@ public class DialogWindowController implements Initializable {
     }
 
     public void saveButton(ActionEvent event) {
+        this.dao=controller.getDao();
         Logo editLogo = new Logo();
+        DateFormat outputformat = new SimpleDateFormat("MM.dd.yyyy HH:mm:ss");
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Error Dialog");
+        Date date = null;
+        String output = null;
         if ((!productNameField.getText().isEmpty())&&(!idBaseField.getText().isEmpty())) {
+            if (!idBaseField.getText().matches("\\d+")){
+                alert.setHeaderText("idBase must contain only numbers");
+                alert.setContentText("Please correct the field");
+                alert.showAndWait();
+                return;
+            }
             switch (btnDialogWindow.getText()) {
                 case "Save":
                     if (controller.calcLogoSize() > 12)
                         editLogo.setEventTypeLogo(EventTypeLogo.PANE);
                     else
                         editLogo.setEventTypeLogo(EventTypeLogo.LOGO);
-                    editLogo.setDate(new Date().toString());
+                        date=new Date();
+
+                    output = outputformat.format(date);
+                    editLogo.setDate(output);
                     editLogo.setProductName(productNameField.getText());
                     editLogo.setIdBase(Integer.parseInt(idBaseField.getText()));
                     editLogo.setSize(controller.getLogoSize());
@@ -70,6 +92,7 @@ public class DialogWindowController implements Initializable {
                     dao.insert(editLogo);
                     break;
                 case "Edit":
+                    editLogo=Controller.editLogo;
                     editLogo.setProductName(productNameField.getText());
                     editLogo.setIdBase(Integer.parseInt(idBaseField.getText()));
                     editLogo.setId(Controller.editLogo.getId());
@@ -83,13 +106,10 @@ public class DialogWindowController implements Initializable {
             controller.isPressCheck = false;
             controller.isCalcSize = false;
         } else {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Error Dialog");
             alert.setHeaderText("Some fields are not filled");
             alert.setContentText("Please enter information");
             alert.showAndWait();
         }
-
     }
 
     public void pressCancel(ActionEvent event) {

@@ -9,7 +9,7 @@ import java.util.Collection;
 public interface LogoDAO {
     boolean insert(Logo logo);
     boolean delete(Logo logo);
-    Logo find(Integer id);
+    Logo find(Logo logo);
     boolean update(Logo logo);
     ObservableList<Logo> getAll();
 }

@@ -71,7 +71,7 @@ public class CaptureController implements Initializable{
     }
 
     public void fillCanvas(GraphicsContext gc) {
-        gc.setFill(Color.color(0.1,0.1,0.1,0.4));
+        gc.setFill(Color.rgb(149,249,78,0.2));
         gc.fillRect(0,0,gc.getCanvas().getWidth(),gc.getCanvas().getHeight());
     }
 
@@ -79,6 +79,8 @@ public class CaptureController implements Initializable{
         clearCanvas(gc);
         fillCanvas(gc);
         gc.clearRect(rectangle.x,rectangle.y,rectangle.width,rectangle.height);
+        gc.setStroke(Color.RED);
+        gc.strokeRect(rectangle.x,rectangle.y,rectangle.width,rectangle.height);
     }
 
     public int getHeightScreen(){

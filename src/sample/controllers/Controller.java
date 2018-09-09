@@ -1,5 +1,7 @@
 package sample.controllers;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -34,6 +36,7 @@ import sample.entity.Logo;
 import sample.dao.impl.CollectionLogoDAO;
 import sample.start.Main;
 import sample.utils.EventTypeLogo;
+import sample.utils.Utils;
 
 
 import javax.imageio.ImageIO;
@@ -48,26 +51,6 @@ import java.util.ResourceBundle;
 
 
 public class Controller implements Initializable{
-
-    private static String TEST_DATA_SQL = "INSERT INTO public.logo(" +
-            "\tnameproduct, idbase, sizelogo, type_event, date)" +
-            "\tVALUES ('Rozetka', 2194, 33.5, 'PANE', '04/03/18');" +
-            "\t\n" +
-            "INSERT INTO public.logo(" +
-            "\tnameproduct, idbase, sizelogo, type_event, date)" +
-            "\tVALUES ('Coca Cola', 2195, 10.2, 'LOGO', '05/03/18');" +
-            "\t\n" +
-            "INSERT INTO public.logo(" +
-            "\tnameproduct, idbase, sizelogo, type_event, date)" +
-            "\tVALUES ('Onkyo', 2193, 1.2, 'LOGO', '05/03/18'" +
-            "\n" +
-            "INSERT INTO public.logo(\n" +
-            "\tnameproduct, idbase, sizelogo, type_event, date)\n" +
-            "\tVALUES ('BMW', 4215, 15, 'PANE', '15/03/18');" +
-            "\t\n" +
-            "INSERT INTO public.logo(\n" +
-            "\tnameproduct, idbase, sizelogo, type_event, date)" +
-            "\tVALUES ('Microsof', 1252, 17, 'PANE', '01/03/18');";
 
     @FXML
     public ImageView imgViewMain;
@@ -89,9 +72,11 @@ public class Controller implements Initializable{
     public TableColumn<Logo,Double> size;
     public TableColumn<Logo,String> date;
     public TableColumn<Logo,EventTypeLogo> eventTypeLogo;
-    public Button show;
     public Button btnSaveImg;
     public Label lblResult;
+    public Button btnConnect;
+    public Button btnEdit;
+    public Button btnDelete;
 
     @FXML
     Canvas canvasMain;
@@ -132,7 +117,7 @@ public class Controller implements Initializable{
 
     DAOFactory daoFactory;
     Connection connection;
-    LogoDAO dao;
+    public static LogoDAO dao;
 
     public static Logo editLogo;
 
@@ -257,10 +242,7 @@ public class Controller implements Initializable{
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        this.daoFactory = DAOFactory.getDAOFactory(DAOFactory.POSTGRESQL);
-        this.connection = daoFactory.createConnection();
-        this.dao = daoFactory.getLogoDAO();
-        updateTable();
+
 
         id.setCellValueFactory(new PropertyValueFactory<Logo, Integer>("id"));
         productName.setCellValueFactory(new PropertyValueFactory<Logo, String>("productName"));
@@ -271,7 +253,7 @@ public class Controller implements Initializable{
         this.primaryStage = Main.getPrimaryStage();
 
         this.captureStage = new Stage();
-        FXMLLoader loader1 = new FXMLLoader(getClass().getResource("../fxml/CaptureWindow.fxml"));
+        FXMLLoader loader1 = new FXMLLoader(getClass().getResource("CaptureWindow.fxml"));
         this.root = null;
         try {
             root = loader1.load();
@@ -281,7 +263,7 @@ public class Controller implements Initializable{
         this.captureController = loader1.getController();
 
         this.dialogStage = new Stage();
-        FXMLLoader loader2 = new FXMLLoader(getClass().getResource("../fxml/DialogWindow.fxml"));
+        FXMLLoader loader2 = new FXMLLoader(getClass().getResource("DialogWindow.fxml"));
         this.root = null;
         try {
             root = loader2.load();
@@ -307,12 +289,26 @@ public class Controller implements Initializable{
         btnCheck.setDisable(true);
         btnSave.setDisable(true);
         btnSaveImg.setDisable(true);
+        btnEdit.setDisable(true);
+        btnDelete.setDisable(true);
 
         lblResult.setFont(Font.font("Verdana",FontWeight.BOLD,15));
         lblResult.setText("--%");
 
         accord.setExpandedPane(titledPane1);
-        this.logoDao = new CollectionLogoDAO();
+
+        this.daoFactory = DAOFactory.getDAOFactory(DAOFactory.COLLECTION);
+//        this.connection = daoFactory.createConnection();
+        this.dao = daoFactory.getLogoDAO();
+
+        ObservableList<Logo> logoList;
+        logoList=Utils.loadDb();
+        for (int i = 0; i < logoList.size(); i++) {
+            dao.insert(logoList.get(i));
+        }
+
+        updateTable();
+        btnConnect.setDisable(true);
     }
 
 
@@ -378,27 +374,35 @@ public class Controller implements Initializable{
     }
 
     public void btnEditLogo(ActionEvent event) {
-        dialogStage.setTitle("Edit");
-        dialogWindowController.btnDialogWindow.setText("Edit");
-        Logo logo = (Logo) tableView.getSelectionModel().getSelectedItem();
-        dialogWindowController.productNameField.setText(logo.getProductName());
-        dialogWindowController.idBaseField.setText(Integer.toString(logo.getIdBase()));
-        this.editLogo = logo;
-        dialogStage.showAndWait();
+        if (!tableView.getSelectionModel().getSelectedCells().isEmpty()) {
+            dialogStage.setTitle("Edit");
+            dialogWindowController.btnDialogWindow.setText("Edit");
+            Logo logo = (Logo) tableView.getSelectionModel().getSelectedItem();
+            dialogWindowController.productNameField.setText(logo.getProductName());
+            dialogWindowController.idBaseField.setText(Integer.toString(logo.getIdBase()));
+            this.editLogo = logo;
+            dialogStage.showAndWait();
+        }
     }
 
     public void btnDeleteLogo(ActionEvent event) {
-        dao.delete((Logo) tableView.getSelectionModel().getSelectedItem());
-        updateTable();
+        if (!tableView.getSelectionModel().getSelectedCells().isEmpty()) {
+            dao.delete((Logo) tableView.getSelectionModel().getSelectedItem());
+            updateTable();
+        }
     }
 
     public void dblClick(MouseEvent mouseEvent) {
+        if (mouseEvent.getClickCount()==1){
+            btnDelete.setDisable(false);
+            btnEdit.setDisable(false);
+        }
         if (mouseEvent.getClickCount() == 2){
             isPressCheck=false;
             captureController.clearCanvas(this.gc);
             lblResult.setText("--%");
             Logo logo = (Logo) tableView.getSelectionModel().getSelectedItem();
-            resImage=dao.find(logo.getId()).getImage();
+            resImage=dao.find(logo).getImage();
             imgViewMain.setImage(resImage);
             System.out.println(logo.getId());
             btnSave.setDisable(true);
@@ -449,6 +453,7 @@ public class Controller implements Initializable{
         FileChooser.ExtensionFilter extFilterJPG = new FileChooser.ExtensionFilter("JPG files (*.jpg)", "*.JPG");
         fileChooser.getExtensionFilters().addAll(extFilterJPG, extFilterPNG);
         fileChooser.setTitle("Save Image");
+        fileChooser.setInitialDirectory(new File(System.getProperty("user.home"),"/Desktop"));
         File file = fileChooser.showSaveDialog(null);
         if (file != null) {
             try {
@@ -460,11 +465,20 @@ public class Controller implements Initializable{
         }
     }
 
+    public LogoDAO getDao(){
+        return dao;
+    }
+
     public void clearRect(){
         captureController.clearCanvas(this.gc);
     }
 
-    public void showImage(ActionEvent event){
-        getResultImage();
+    public void btnConn(ActionEvent event) {
+        ObservableList<Logo> logoList = FXCollections.observableArrayList();
+        logoList=Utils.loadDb();
+        for (int i = 0; i < logoList.size(); i++) {
+            dao.insert(logoList.get(i));
+        }
+        updateTable();
     }
 }

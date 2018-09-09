@@ -1,19 +1,22 @@
 package sample.entity;
 
-import javafx.beans.property.SimpleDoubleProperty;
-import javafx.beans.property.SimpleFloatProperty;
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.*;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
 import sample.utils.EventTypeLogo;
 
-public class Logo {
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.*;
+import java.nio.ByteBuffer;
+
+public class Logo implements Serializable {
     private SimpleIntegerProperty id = new SimpleIntegerProperty(0);
     private SimpleStringProperty productName = new SimpleStringProperty("");
     private SimpleIntegerProperty idBase = new SimpleIntegerProperty(0);
     private SimpleFloatProperty size = new SimpleFloatProperty(0);
     private EventTypeLogo eventTypeLogo;
-    private SimpleStringProperty date = new SimpleStringProperty("1/01/2018");
+    private SimpleStringProperty date = new SimpleStringProperty("01/01/1970");
 
     private Image image;
 
@@ -26,6 +29,15 @@ public class Logo {
         this.size = sizeLogo;
         this.eventTypeLogo = eventTypeLogo;
         this.date = date;
+    }
+
+    public Logo(Logo logo){
+        this.id = logo.idProperty();
+        this.productName = logo.productNameProperty();
+        this.idBase = logo.idBaseProperty();
+        this.size = logo.sizeProperty();
+        this.eventTypeLogo = logo.getEventTypeLogo();
+        this.date = logo.dateProperty();
     }
 
     public int getId() {
@@ -64,7 +76,7 @@ public class Logo {
         this.idBase.set(idBase);
     }
 
-    public double getSize() {
+    public float getSize() {
         return size.get();
     }
 
@@ -115,5 +127,37 @@ public class Logo {
                 ", eventTypeLogo=" + eventTypeLogo +
                 ", date=" + date +
                 '}';
+    }
+
+    private void writeObject(ObjectOutputStream s) throws IOException {
+//        s.defaultWriteObject();
+        s.writeInt(getId());
+        s.writeInt(getIdBase());
+        s.writeUTF(getProductName());
+        s.writeFloat(getSize());
+        s.writeObject(getEventTypeLogo());
+        s.writeUTF(getDate());
+//        s.writeObject(getImage());
+        byte[] res = null;
+        BufferedImage bImage2 = SwingFXUtils.fromFXImage(getImage(), null);
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        InputStream inputStream;
+        try {
+            ImageIO.write(bImage2, "png", outputStream);
+            res  = outputStream.toByteArray();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        s.write(res);
+    }
+
+    private void readObject(ObjectInputStream s) throws IOException, ClassNotFoundException {
+        id = new SimpleIntegerProperty(s.readInt());
+        idBase = new SimpleIntegerProperty(s.readInt());
+        productName = new SimpleStringProperty(s.readUTF());
+        size = new SimpleFloatProperty(s.readFloat());
+        eventTypeLogo = (EventTypeLogo) s.readObject();
+        date = new SimpleStringProperty(s.readUTF());
+        image = SwingFXUtils.toFXImage(ImageIO.read(s),null);
     }
 }

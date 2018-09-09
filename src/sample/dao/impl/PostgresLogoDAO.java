@@ -88,12 +88,12 @@ public class PostgresLogoDAO implements LogoDAO {
     }
 
     @Override
-    public Logo find(Integer id) {
+    public Logo find(Logo logo) {
         PreparedStatement preparedStatement = null;
         Logo resultLogo = new Logo();
         try {
             preparedStatement = conn.prepareStatement(SELECT_SQL2);
-            preparedStatement.setInt(1,id);
+            preparedStatement.setInt(1,logo.getId());
             ResultSet rs = preparedStatement.executeQuery();
             while (rs.next()) {
                 resultLogo.setId(rs.getInt("id"));
