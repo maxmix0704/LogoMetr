@@ -55,8 +55,6 @@ public class Controller implements Initializable{
 
     @FXML
     public ImageView imgViewMain;
-
-    @FXML
     public StackPane stackPane;
     public Button btnCheck;
     public Button btnSave;
@@ -65,7 +63,6 @@ public class Controller implements Initializable{
     public TitledPane titledPane2;
     public TitledPane titledPane3;
     public Accordion accord;
-
     public TableView tableView;
     public TableColumn<Logo,Integer> id;
     public TableColumn<Logo,String> productName;
@@ -81,7 +78,6 @@ public class Controller implements Initializable{
 
     @FXML
     Canvas canvasMain;
-
     Stage captureStage;
     Stage primaryStage;
     static Stage dialogStage;
@@ -98,26 +94,26 @@ public class Controller implements Initializable{
     Boolean isClicked=false;
     Boolean isPressCheck =false;
     Boolean isCalcSize = false;
-    Boolean isFrameCreate = false;
     Boolean isRectCreate = false;
     Boolean isZoomed =false;
 
     public static GraphicsContext gc;
 
-    float startX;
-    float startY;
-    float endX;
-    float endY;
+    private float startX;
+    private float startY;
+    private float endX;
+    private float endY;
 
     public static float logoSize;
 
-    Image defImage;
-    Image resImage;
-    Rectangle rectangle;
+    private Image defImage;
+    private Image resImage;
+    private Rectangle rectangle;
 
 
-    DAOFactory daoFactory;
-    Connection connection;
+    private DAOFactory daoFactory;
+    private Connection connection;
+
     public static LogoDAO dao;
 
     public static Logo editLogo;
@@ -149,11 +145,7 @@ public class Controller implements Initializable{
         captureStage.getScene().setOnKeyPressed(new EventHandler<KeyEvent>() {
             public void handle(KeyEvent keyEvent) {
                 if (keyEvent.getCode() == KeyCode.ENTER) {
-                    defImage = captureController.grabScreenRegion(captureController.getRectAWT(
-                            (int) captureController.startX,
-                            (int) captureController.startY,
-                            (int) captureController.endX,
-                            (int) captureController.endY));
+                    defImage = captureController.grabScreenRegion(captureController.getCurrRectAWT());
                     imgViewMain.setImage(defImage);
                     imgViewMain.setFitWidth(imgViewMain.getImage().getWidth());
                     imgViewMain.setFitHeight(imgViewMain.getImage().getHeight());
@@ -242,15 +234,17 @@ public class Controller implements Initializable{
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        //set cell on tableview
         id.setCellValueFactory(new PropertyValueFactory<Logo, Integer>("id"));
         productName.setCellValueFactory(new PropertyValueFactory<Logo, String>("productName"));
         idBase.setCellValueFactory(new PropertyValueFactory<Logo, Integer>("idBase"));
         date.setCellValueFactory(new PropertyValueFactory<Logo, String>("date"));
         size.setCellValueFactory(new PropertyValueFactory<Logo, Double>("size"));
         eventTypeLogo.setCellValueFactory(new PropertyValueFactory<Logo, EventTypeLogo>("eventTypeLogo"));
-        this.primaryStage = Main.getPrimaryStage();
 
+        this.primaryStage = Main.getPrimaryStage();
         this.captureStage = new Stage();
+
         FXMLLoader loader1 = new FXMLLoader(getClass().getResource("CaptureWindow.fxml"));
         this.root = null;
         try {
@@ -269,12 +263,14 @@ public class Controller implements Initializable{
             e.printStackTrace();
         }
         this.dialogWindowController = loader2.getController();
+
+        //init dialog stage to default settings
         dialogStage.setScene(new Scene(loader2.getRoot()));
         dialogStage.initModality(Modality.WINDOW_MODAL);
         dialogStage.setResizable(false);
         dialogStage.initOwner(primaryStage);
 
-        imgViewMain.setImage(new Image("images/not_found.png"));
+        //init capture stage to default settings
         captureStage.setScene(new Scene(loader1.getRoot(), captureController.getWidthScreen(), captureController.getHeightScreen()));
         captureStage.setX(0);
         captureStage.setY(0);
@@ -283,30 +279,25 @@ public class Controller implements Initializable{
         captureStage.initModality(Modality.WINDOW_MODAL);
         captureStage.initOwner(primaryStage);
         captureStage.initStyle(StageStyle.UNDECORATED);
+
+        //init main stage to default settings
         this.gc=canvasMain.getGraphicsContext2D();
+        imgViewMain.setImage(new Image("images/not_found.png"));
         btnCheck.setDisable(true);
         btnSave.setDisable(true);
         btnSaveImg.setDisable(true);
         btnEdit.setDisable(true);
         btnDelete.setDisable(true);
-
+        btnConnect.setDisable(true);
         lblResult.setFont(Font.font("Verdana",FontWeight.BOLD,15));
         lblResult.setText("--%");
-
         accord.setExpandedPane(titledPane1);
 
+        //load db and show it in tableview
         this.daoFactory = DAOFactory.getDAOFactory(DAOFactory.COLLECTION);
-//        this.connection = daoFactory.createConnection();
+        this.connection = daoFactory.createConnection();
         this.dao = daoFactory.getLogoDAO();
-
-        ObservableList<Logo> logoList;
-        logoList=Utils.loadDb();
-        for (int i = 0; i < logoList.size(); i++) {
-            dao.insert(logoList.get(i));
-        }
-
-        updateTable();
-        btnConnect.setDisable(true);
+        updateTable(dao.getAll());
     }
 
 
@@ -317,7 +308,7 @@ public class Controller implements Initializable{
             btnSaveImg.setDisable(false);
         }
     }
-
+    //function for output text on a graphics components
     public void showText(GraphicsContext gc, String format, Object text, int size, Color color, int x, int y) {
         gc.setTextAlign(TextAlignment.CENTER);
         gc.setTextBaseline(VPos.CENTER);
@@ -335,7 +326,7 @@ public class Controller implements Initializable{
         canvasMain.setFocusTraversable(true);
         showText(this.gc,"%s","Hightline the logo", 25,COLOR_TEXT_SELECT_LOGO,(int) canvasMain.getWidth()/2,(int)canvasMain.getHeight()/2);
     }
-
+    //function for calculate size of logo
     public float calcLogoSize(){
         float result;
         float sizeFrame = (float) (canvasMain.getHeight()*canvasMain.getWidth());
@@ -368,6 +359,11 @@ public class Controller implements Initializable{
         tableView.getSortOrder().add(id);
     }
 
+    public void updateTable(ObservableList list) {
+        tableView.setItems(list);
+        tableView.getSortOrder().add(id);
+    }
+
     public static Stage getDialogStage(){
         return dialogStage;
     }
@@ -386,17 +382,14 @@ public class Controller implements Initializable{
 
     public void btnDeleteLogo(ActionEvent event) {
         if (!tableView.getSelectionModel().getSelectedCells().isEmpty()) {
-
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
             alert.setTitle("Delete File");
             alert.setHeaderText("Are you sure want to delete this record?");
             Optional<ButtonType> option = alert.showAndWait();
-
             if (option.get() == ButtonType.OK) {
                 dao.delete((Logo) tableView.getSelectionModel().getSelectedItem());
                 updateTable();
             }
-
         }
     }
 
@@ -417,16 +410,21 @@ public class Controller implements Initializable{
             btnSaveImg.setDisable(false);
         }
     }
-
+    //get composite image (frame with highline region and information)
     public Image getResultImage(){
+        //get image from tableview(screen snapshot)
+        //convert it to bufImage
         Image image = imgViewMain.getImage();
         BufferedImage bImage = SwingFXUtils.fromFXImage(image, null);
 
+        //get image from canvas(with highline region and information)
+        //onvert it to bufImage
         SnapshotParameters params = new SnapshotParameters();
         params.setFill(Color.TRANSPARENT);
         Image snapshot = canvasMain.snapshot(params, null);
-
         BufferedImage bImage2 = SwingFXUtils.fromFXImage(snapshot, null);
+
+        //resize snapshot from canvas to size of screen snapshot
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         InputStream inputStream;
         try {
@@ -438,6 +436,8 @@ public class Controller implements Initializable{
             e.printStackTrace();
         }
         bImage2 = SwingFXUtils.fromFXImage(snapshot, null);
+
+        //composite two image to one
         float alpha = 1f;
         int compositeRule = AlphaComposite.SRC_OVER;
         AlphaComposite ac;
@@ -477,16 +477,6 @@ public class Controller implements Initializable{
         return dao;
     }
 
-//    public void clearRect(){
-//        captureController.clearCanvas(this.gc);
-//    }
-
     public void btnConn(ActionEvent event) {
-        ObservableList<Logo> logoList = FXCollections.observableArrayList();
-        logoList=Utils.loadDb();
-        for (int i = 0; i < logoList.size(); i++) {
-            dao.insert(logoList.get(i));
-        }
-        updateTable();
     }
 }

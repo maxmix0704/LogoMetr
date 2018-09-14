@@ -9,16 +9,15 @@ import java.sql.DriverManager;
 import java.util.Properties;
 
 public class PostgreSQLDAOFactory extends DAOFactory {
-    public static final String URL = "jdbc:postgresql://127.0.0.1:5432/postgres";
-    public static final String LOGIN = "postgres";
-    public static final String PASSWORD = "t710ph";
+    private static final String URL = "jdbc:postgresql://127.0.0.1:5432/postgres";
+    private static final String LOGIN = "postgres";
+    private static final String PASSWORD = "t710ph";
 
     public Connection createConnection() {
         try {
             Class.forName("org.postgresql.Driver");
         } catch (ClassNotFoundException e) {
-            System.out.println("Where is your PostgreSQL JDBC Driver? "
-                    + "Include in your library path!");
+            System.out.println("PostgreSQL JDBC Driver not found");
             e.printStackTrace();
         }
         System.out.println("PostgreSQL JDBC Driver Registered!");
@@ -29,7 +28,7 @@ public class PostgreSQLDAOFactory extends DAOFactory {
             System.out.println("Connection Failed! Check output console");
         }
         if (connection != null) {
-            System.out.println("You made it, take control your database now!");
+            System.out.println("Connection is successful");
         } else {
             System.out.println("Failed to make connection!");
         }

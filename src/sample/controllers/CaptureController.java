@@ -31,12 +31,12 @@ public class CaptureController implements Initializable{
     @FXML
     Canvas canvas;
 
-    Stage captureStage;
+    private Stage captureStage;
 
-    float startX;
-    float startY;
-    float endX;
-    float endY;
+    private float startX;
+    private float startY;
+    private float endX;
+    private float endY;
 
     public GraphicsContext gc;
 
@@ -51,7 +51,9 @@ public class CaptureController implements Initializable{
         try {
             return SwingFXUtils.toFXImage(new Robot().createScreenCapture(rectangle), null);
         } catch (SecurityException e) {
+            e.printStackTrace();
         } catch (AWTException e) {
+            e.printStackTrace();
         }
         return null;
     }
@@ -61,7 +63,9 @@ public class CaptureController implements Initializable{
 
             return SwingFXUtils.toFXImage(new Robot().createScreenCapture(new Rectangle(x1,y1,x2-x1,y2-y1)), null);
         } catch (SecurityException e) {
+            e.printStackTrace();
         } catch (AWTException e) {
+            e.printStackTrace();
         }
         return null;
     }
@@ -109,6 +113,10 @@ public class CaptureController implements Initializable{
         else {
             isClicked=false;
         }
+    }
+
+    public Rectangle getCurrRectAWT(){
+        return getRectAWT(startX,startY,endX,endY);
     }
 
     public Rectangle getRectAWT(float x, float y, float x2, float y2){

@@ -8,7 +8,7 @@ import sample.utils.EventTypeLogo;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.*;
-import java.nio.ByteBuffer;
+
 
 public class Logo implements Serializable, Comparable<Logo> {
     private SimpleIntegerProperty id = new SimpleIntegerProperty(0);
@@ -17,7 +17,6 @@ public class Logo implements Serializable, Comparable<Logo> {
     private SimpleFloatProperty size = new SimpleFloatProperty(0);
     private EventTypeLogo eventTypeLogo;
     private SimpleStringProperty date = new SimpleStringProperty("01/01/1970");
-
     private Image image;
 
     public Logo(){}
@@ -131,18 +130,15 @@ public class Logo implements Serializable, Comparable<Logo> {
     }
 
     private void writeObject(ObjectOutputStream s) throws IOException {
-//        s.defaultWriteObject();
         s.writeInt(getId());
         s.writeInt(getIdBase());
         s.writeUTF(getProductName());
         s.writeFloat(getSize());
         s.writeObject(getEventTypeLogo());
         s.writeUTF(getDate());
-//        s.writeObject(getImage());
         byte[] res = null;
         BufferedImage bImage2 = SwingFXUtils.fromFXImage(getImage(), null);
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        InputStream inputStream;
         try {
             ImageIO.write(bImage2, "png", outputStream);
             res  = outputStream.toByteArray();

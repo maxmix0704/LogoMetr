@@ -19,6 +19,8 @@ public class CollectionLogoDAO implements LogoDAO{
 
     public CollectionLogoDAO(){
         logoList = FXCollections.observableArrayList();
+        //load collection from file (collectionDB)
+        logoList=Utils.loadDb();
     }
 
     @Override

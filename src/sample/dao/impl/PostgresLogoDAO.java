@@ -4,54 +4,38 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
-import org.postgresql.core.Utils;
 import sample.dao.factory.PostgreSQLDAOFactory;
 import sample.dao.interfaces.LogoDAO;
 import sample.entity.Logo;
 import sample.utils.EventTypeLogo;
-import sample.utils.ImageConvert;
 
 import javax.imageio.ImageIO;
-import javax.sql.RowSet;
 import java.awt.image.BufferedImage;
 import java.io.*;
-import java.nio.channels.Channels;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Collection;
-import java.util.concurrent.Executors;
 
 public class PostgresLogoDAO implements LogoDAO {
     private static String INSERT_SQL = "INSERT INTO public.logo (nameproduct,idbase,sizelogo,type_event,date,image)VALUES (?,?,?,?,?,?);";
     private static String DELETE_SQL = "DELETE FROM public.logo WHERE id=?;";
-    private static String SELECT_SQL = "SELECT nameproduct, idbase, sizelogo, type_event, date, id FROM public.logo WHERE id = ?;";
-    private static String SELECT_SQL2 = "SELECT id, nameproduct, idbase, sizelogo, type_event, date, image FROM public.logo WHERE id = ?;";
+    private static String SELECT_SQL = "SELECT id, nameproduct, idbase, sizelogo, type_event, date, image FROM public.logo WHERE id = ?;";
     private static String SELECT_ALL_SQL = "SELECT nameproduct, idbase, sizelogo, type_event, date, id FROM public.logo;";
     private static String UPDATE_SQL = "UPDATE public.logo SET nameproduct=?, idbase=? WHERE id=?;";
 
-    Connection conn =  new PostgreSQLDAOFactory().createConnection();
+    private Connection conn =  new PostgreSQLDAOFactory().createConnection();
 
     @Override
     public boolean insert(Logo logo) {
-        PreparedStatement preparedStatement = null;
+        PreparedStatement preparedStatement;
         try {
             preparedStatement = conn.prepareStatement(INSERT_SQL);
-
-            FileInputStream fileInputStream;
-//            File image = new File("C:/image.jpg");
-
             BufferedImage bImage = SwingFXUtils.fromFXImage(logo.getImage(), null);
             ByteArrayOutputStream s = new ByteArrayOutputStream();
             ImageIO.write(bImage, "png", s);
             byte[] res  = s.toByteArray();
             s.close();
-
-//            ImageIO.write(SwingFXUtils.fromFXImage(logo.getImage(), null),"BufferedImages", image);
-//
-//            fileInputStream = new FileInputStream(image);
-
             preparedStatement.setString(1,logo.getProductName());
             preparedStatement.setInt(2,logo.getIdBase());
             preparedStatement.setDouble(3,logo.getSize());
@@ -74,7 +58,7 @@ public class PostgresLogoDAO implements LogoDAO {
 
     @Override
     public boolean delete(Logo logo) {
-        PreparedStatement preparedStatement = null;
+        PreparedStatement preparedStatement;
         try {
             preparedStatement = conn.prepareStatement(DELETE_SQL);
             preparedStatement.setInt(1,logo.getId());
@@ -89,10 +73,10 @@ public class PostgresLogoDAO implements LogoDAO {
 
     @Override
     public Logo find(Logo logo) {
-        PreparedStatement preparedStatement = null;
+        PreparedStatement preparedStatement;
         Logo resultLogo = new Logo();
         try {
-            preparedStatement = conn.prepareStatement(SELECT_SQL2);
+            preparedStatement = conn.prepareStatement(SELECT_SQL);
             preparedStatement.setInt(1,logo.getId());
             ResultSet rs = preparedStatement.executeQuery();
             while (rs.next()) {
@@ -102,10 +86,8 @@ public class PostgresLogoDAO implements LogoDAO {
                 resultLogo.setDate(rs.getString("date"));
                 resultLogo.setIdBase(rs.getInt("idbase"));
                 resultLogo.setEventTypeLogo(EventTypeLogo.getEventType(rs.getString("type_event")));
-
                 byte[] img = rs.getBytes("image");
                 Image image = new Image(new ByteArrayInputStream(img));
-
                 resultLogo.setImage(image);
             }
             preparedStatement.close();
@@ -118,7 +100,7 @@ public class PostgresLogoDAO implements LogoDAO {
 
     @Override
     public boolean update(Logo logo) {
-        PreparedStatement preparedStatement = null;
+        PreparedStatement preparedStatement;
         try {
             preparedStatement = conn.prepareStatement(UPDATE_SQL);
             preparedStatement.setString(1,logo.getProductName());
@@ -136,8 +118,8 @@ public class PostgresLogoDAO implements LogoDAO {
     @Override
     public ObservableList<Logo> getAll() {
         ObservableList<Logo> logoList = FXCollections.observableArrayList();
-        PreparedStatement preparedStatement = null;
-        Logo rsLogo = null;
+        PreparedStatement preparedStatement;
+        Logo rsLogo;
         try {
             preparedStatement = conn.prepareStatement(SELECT_ALL_SQL);
             ResultSet rs = preparedStatement.executeQuery();

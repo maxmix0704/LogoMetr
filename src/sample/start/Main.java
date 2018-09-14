@@ -35,7 +35,6 @@ public class Main extends Application {
 
     }
 
-
     public static void main(String[] args) throws AWTException {
         launch(args);
     }
@@ -43,6 +42,7 @@ public class Main extends Application {
     public static Stage getPrimaryStage(){
         return primaryStage;
     }
+
     public static FXMLLoader getLoader(){
         return loader;
     }
