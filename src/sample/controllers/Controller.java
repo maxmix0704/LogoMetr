@@ -1,6 +1,5 @@
 package sample.controllers;
 
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
@@ -33,10 +32,8 @@ import javafx.stage.*;
 import sample.dao.DAOFactory;
 import sample.dao.interfaces.LogoDAO;
 import sample.entity.Logo;
-import sample.dao.impl.CollectionLogoDAO;
 import sample.start.Main;
 import sample.utils.EventTypeLogo;
-import sample.utils.Utils;
 
 
 import javax.imageio.ImageIO;
@@ -77,27 +74,25 @@ public class Controller implements Initializable{
     public Button btnDelete;
 
     @FXML
-    Canvas canvasMain;
-    Stage captureStage;
-    Stage primaryStage;
-    static Stage dialogStage;
+    private Canvas canvasMain;
+    private Stage captureStage;
+    private Stage primaryStage;
+    private static Stage dialogStage;
 
 
-    CaptureController captureController;
-    DialogWindowController dialogWindowController;
-    Controller controller;
+    private CaptureController captureController;
+    private DialogWindowController dialogWindowController;
+    private Controller controller;
 
-    CollectionLogoDAO logoDao;
+    private Parent root;
 
-    Parent root;
+    private Boolean clicked =false;
+    private Boolean pressCheck =false;
+    private Boolean calcSize = false;
+    private Boolean rectCreate = false;
+    private Boolean zoomed =false;
 
-    Boolean isClicked=false;
-    Boolean isPressCheck =false;
-    Boolean isCalcSize = false;
-    Boolean isRectCreate = false;
-    Boolean isZoomed =false;
-
-    public static GraphicsContext gc;
+    private static GraphicsContext gc;
 
     private float startX;
     private float startY;
@@ -114,9 +109,9 @@ public class Controller implements Initializable{
     private DAOFactory daoFactory;
     private Connection connection;
 
-    public static LogoDAO dao;
+    private static LogoDAO dao;
 
-    public static Logo editLogo;
+    private static Logo editLogo;
 
     private static Color COLOR_TEXT_PERCENT_OF_LOGO = Color.rgb(141,19,144, 1);
     private static Color COLOR_TEXT_SELECT_FRAME = Color.rgb(49,38,255,0.9);
@@ -163,22 +158,22 @@ public class Controller implements Initializable{
                 }
             }
         });
-        isPressCheck=false;
-        isCalcSize=false;
+        setPressCheck(false);
+        setCalcSize(false);
         primaryStage.setMaximized(true);
         lblResult.setText("--%");
     }
 
     public void scrollMouse(ScrollEvent scrollEvent) {
-        if (!isClicked) {
+        if (!isClicked()) {
             float width = (float) imgViewMain.getFitWidth();
             float height = (float) imgViewMain.getFitHeight();
             float kZoom;
-            if (!isZoomed) {
+            if (!isZoomed()) {
                 resImage = getResultImage();
                 imgViewMain.setImage(resImage);
                 captureController.clearCanvas(this.gc);
-                isZoomed = true;
+                setZoomed(true);
             }
             if (scrollEvent.getDeltaY() > 0) {
                 kZoom = 0.9f;
@@ -200,8 +195,8 @@ public class Controller implements Initializable{
     }
 
     public void movedMouseMain(MouseEvent mouseEvent) {
-        if  (isClicked&&isPressCheck) {
-            isRectCreate =true;
+        if  (isClicked() && isPressCheck()) {
+            setRectCreate(true);
             endX = (int) mouseEvent.getX();
             endY = (int) mouseEvent.getY();
             rectangle=captureController.getRectAWT(startX,startY,endX,endY);
@@ -214,10 +209,10 @@ public class Controller implements Initializable{
     }
 
     public void pressMouseMain(MouseEvent mouseEvent) {
-        if (!isClicked&&isPressCheck) {
-            isClicked = true;
-            isCalcSize = false;
-            isZoomed=false;
+        if (!isClicked() && isPressCheck()) {
+            setClicked(true);
+            setCalcSize(false);
+            setZoomed(false);
             captureController.clearCanvas(this.gc);
             imgViewMain.setImage(defImage);
             this.startX= (int) mouseEvent.getX();
@@ -226,9 +221,8 @@ public class Controller implements Initializable{
             btnSaveImg.setDisable(true);
         }
         else {
-            isClicked=false;
+            setClicked(false);
             canvasMain.requestFocus();
-            System.out.println(startX+" "+startY+"-"+endX+" "+endY);
         }
     }
 
@@ -303,7 +297,7 @@ public class Controller implements Initializable{
 
     public void pressEnter(KeyEvent keyEvent) {
         if (keyEvent.getCode() == KeyCode.ENTER) {
-            isCalcSize = true;
+            setCalcSize(true);
             btnSave.setDisable(false);
             btnSaveImg.setDisable(false);
         }
@@ -321,7 +315,7 @@ public class Controller implements Initializable{
     }
 
     public void btnCheckLogo(ActionEvent event) {
-        isPressCheck =true;
+        setPressCheck(true);
         btnCheck.setDisable(true);
         canvasMain.setFocusTraversable(true);
         showText(this.gc,"%s","Hightline the logo", 25,COLOR_TEXT_SELECT_LOGO,(int) canvasMain.getWidth()/2,(int)canvasMain.getHeight()/2);
@@ -375,7 +369,7 @@ public class Controller implements Initializable{
             Logo logo = (Logo) tableView.getSelectionModel().getSelectedItem();
             dialogWindowController.productNameField.setText(logo.getProductName());
             dialogWindowController.idBaseField.setText(Integer.toString(logo.getIdBase()));
-            this.editLogo = logo;
+            setEditLogo(logo);
             dialogStage.showAndWait();
         }
     }
@@ -399,17 +393,17 @@ public class Controller implements Initializable{
             btnEdit.setDisable(false);
         }
         if (mouseEvent.getClickCount() == 2){
-            isPressCheck=false;
+            setPressCheck(false);
             captureController.clearCanvas(this.gc);
             lblResult.setText("--%");
             Logo logo = (Logo) tableView.getSelectionModel().getSelectedItem();
             resImage=dao.find(logo).getImage();
             imgViewMain.setImage(resImage);
-            System.out.println(logo.getId());
             btnSave.setDisable(true);
             btnSaveImg.setDisable(false);
         }
     }
+
     //get composite image (frame with highline region and information)
     public Image getResultImage(){
         //get image from tableview(screen snapshot)
@@ -478,5 +472,53 @@ public class Controller implements Initializable{
     }
 
     public void btnConn(ActionEvent event) {
+    }
+
+    public Boolean isClicked() {
+        return clicked;
+    }
+
+    public void setClicked(Boolean clicked) {
+        this.clicked = clicked;
+    }
+
+    public Boolean isPressCheck() {
+        return pressCheck;
+    }
+
+    public void setPressCheck(Boolean pressCheck) {
+        this.pressCheck = pressCheck;
+    }
+
+    public Boolean isCalcSize() {
+        return calcSize;
+    }
+
+    public void setCalcSize(Boolean calcSize) {
+        this.calcSize = calcSize;
+    }
+
+    public Boolean isRectCreate() {
+        return rectCreate;
+    }
+
+    public void setRectCreate(Boolean rectCreate) {
+        this.rectCreate = rectCreate;
+    }
+
+    public Boolean isZoomed() {
+        return zoomed;
+    }
+
+    public void setZoomed(Boolean zoomed) {
+        this.zoomed = zoomed;
+    }
+
+    public static void setEditLogo(Logo logo){
+        editLogo=logo;
+    }
+
+    public static Logo getEditLogo(){
+        return editLogo;
     }
 }

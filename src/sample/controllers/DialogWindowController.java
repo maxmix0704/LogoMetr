@@ -17,9 +17,7 @@ import sample.utils.EventTypeLogo;
 
 import java.net.URL;
 import java.sql.Connection;
-import java.sql.Timestamp;
 import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.ResourceBundle;
@@ -87,10 +85,10 @@ public class DialogWindowController implements Initializable {
                     dao.insert(editLogo);
                     break;
                 case "Edit":
-                    editLogo=Controller.editLogo;
+                    editLogo=Controller.getEditLogo();
                     editLogo.setProductName(productNameField.getText());
                     editLogo.setIdBase(Integer.parseInt(idBaseField.getText()));
-                    editLogo.setId(Controller.editLogo.getId());
+                    editLogo.setId(Controller.getEditLogo().getId());
                     dao.update(editLogo);
                     break;
             }
@@ -98,8 +96,8 @@ public class DialogWindowController implements Initializable {
             idBaseField.setText("");
             productNameField.setText("");
             controller.updateTable();
-            controller.isPressCheck = false;
-            controller.isCalcSize = false;
+            controller.setPressCheck(false);
+            controller.setCalcSize(false);
         } else {
             alert.setHeaderText("Some fields are not filled");
             alert.setContentText("Please enter information");
